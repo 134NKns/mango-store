@@ -1,46 +1,49 @@
-<div class="p-grid">
-  <div class="p-col-12">
-    <h2>Order Status Management</h2>
-    <p-table [value]="orders" class="p-table">
+<p-confirmDialog />
+<div class="pt-3 flex flex-column">
+  <div class="p-col-12 p-md-10 h-full">
+    <p-table [value]="orders"   styleClass="p-datatable-gridlines" emptyMessage="ไม่มีข้อมูลสินค้า" responsiveLayout="scroll" [breakpoint]="'960px'" [tableStyle]="{'min-width': '50rem'}" >
       <ng-template pTemplate="header">
         <tr>
-          <th>Order ID</th>
-          <th>User ID</th>
-          <th>Total Price</th>
-          <th>Status</th>
-          <th>Payment Slip</th>
-          <th>Actions</th>
+          <th>ลำดับ</th>
+          <th>ชื่อสินค้า</th>
+          <th>รูปภาพสินค้า</th>
+           <!-- <th>ชื่อลูกค้า</th> -->
+          <th>ราคารวม</th>
+          <th>สถานะการสั่งซื้อ</th>
+          <th>หลักฐานการจ่ายเงิน</th>
+          <th>จัดการ</th>
         </tr>
       </ng-template>
-      <ng-template pTemplate="body" let-order>
+      <ng-template pTemplate="body" let-order let-i="rowIndex">
         <tr>
-          <td>{{ order.id }}</td>
-          <td>{{ order.user_id }}</td>
-          <td>{{ order.total_price | currency: 'THB':'symbol':'1.2-2' }}</td>
+          <td>{{ i + 1 }}</td>
+          <td>{{ order.order_details[0].product.name }}</td>
           <td>
-            <p-dropdown 
-              [options]="statuses" 
-              [(ngModel)]="order.status" 
-              (onChange)="updateStatus(order)" 
-              *ngIf="userRole !== 'customer'">
+            <img
+              [src]="order.order_details[0]?.product?.images?.length > 0 ? order.order_details[0].product.images[0].image_data : '../../assets/images/no-image.png'"
+              width="70" class="shadow-4" />
+          </td>
+          <td>
+            <button pButton class="main-button p-button-info w-full sm:w-auto" style="min-width: 150px;"
+              label="รายละเอียดสินค้า" icon="pi pi-eye" *ngIf="order.order_details" (click)="viewOrderDetails(order)">
+            </button>
+          </td>
+          <td>{{ order.total_price }} บาท</td>
+          <td>
+            <p-dropdown [options]="statuses" styleClass="w-full" [(ngModel)]="order.status"
+              (onChange)="updateStatus(order)" *ngIf="userRole !== 'customer'">
             </p-dropdown>
             <span *ngIf="userRole === 'customer'">{{ order.status }}</span>
           </td>
           <td>
-            <button pButton 
-              label="View Slip" 
-              icon="pi pi-eye" 
-              (click)="viewSlip(order)" 
-              *ngIf="order.payment_slip">
+            <button pButton class="main-button p-button-success w-full sm:w-auto" style="min-width: 150px;"
+              label="ดูสลิป" icon="pi pi-eye" (click)="viewSlip(order)" *ngIf="order.payment_slip">
             </button>
-            <span *ngIf="!order.payment_slip">No Slip</span>
+            <span *ngIf="!order.payment_slip">ยังไม่อัพโหลดหลักฐาน</span>
           </td>
           <td>
-            <button pButton 
-              label="Cancel" 
-              icon="pi pi-times" 
-              class="p-button-danger" 
-              (click)="deleteOrder(order)" 
+            <button pButton label="ยกเลิกออเดอร์" icon="pi pi-times" class="p-button-danger w-full sm:w-auto"
+              style="min-width: 150px;" [disabled]="order.status === 'cancelled'" (click)="confirmCancel(order)"
               *ngIf="userRole !== 'customer'">
             </button>
           </td>
@@ -48,25 +51,10 @@
       </ng-template>
     </p-table>
   </div>
-
-  <p-dialog 
-    header="Payment Slip" 
-    [(visible)]="displayDialog" 
-    [modal]="true" 
-    [closable]="false" 
-    [dismissableMask]="true">
+  <p-dialog header="หลักฐานการชำระเงิน" [(visible)]="displaySlipDialog" [modal]="true" [dismissableMask]="true">
     <ng-container *ngIf="selectedOrder">
-      <img 
-        *ngIf="selectedOrder.payment_slip" 
-        [src]="'data:image/png;base64,' + selectedOrder.payment_slip" 
-        alt="Payment Slip" 
-        class="payment-slip">
+      <p-image class="payment-slip" *ngIf="selectedOrder.payment_slip"
+        [src]="'data:image/png;base64,' + selectedOrder.payment_slip" alt="Payment Slip" width="350" />
     </ng-container>
-    <button pButton 
-      label="Close" 
-      icon="pi pi-times" 
-      class="p-button-danger" 
-      (click)="closeDialog()">
-    </button>
   </p-dialog>
 </div>

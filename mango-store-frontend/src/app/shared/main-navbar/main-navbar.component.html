@@ -1,5 +1,5 @@
 <div class="navbar-sandbox">
-  <p-menubar [model]="items">
+  <p-menubar [model]="items" styleClass="menuCustom" (click)="activeMenu($event)" aria-modal="true">
     <ng-template pTemplate="start">
       <img
         src="../../../assets/images/logo-2.png"
@@ -13,6 +13,20 @@
       </ng-container>
     </ng-template>
   </p-menubar>
+  <ng-template pTemplate="start">
+    <img
+      src="../../../assets/images/logo-2.png"
+      height="40"
+      class="mr-2 mt-2"
+    />
+  </ng-template>
+
+  <ng-template pTemplate="end">
+    <ng-container *ngIf="currentRole !== null && currentRole !== ''">
+      <p-button icon="pi pi-times" [rounded]="true" severity="danger" label="ออกจากระบบ" (click)="logout()" styleClass="logout-button-label"/>
+    </ng-container>
+  </ng-template>
+  
 
   <p-dialog
     header="{{ loginHeader }}"
@@ -47,6 +61,18 @@
   >
     <div class="appForm">
       <app-edit-page (updateComplete)="handleUpdateComplete($event)"></app-edit-page>
+    </div>
+  </p-dialog>
+
+    <p-dialog
+    header="{{ promtPaySettingHeader }}"
+    [(visible)]="isVisiblePromptPaySettingModal"
+    [modal]="true"
+    [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" 
+    [style]="{ width: '50vw' }" 
+  >
+    <div class="appForm">
+      <app-prompt-pay-page [isVisiblePromptPaySettingModal]="isVisiblePromptPaySettingModal"></app-prompt-pay-page>
     </div>
   </p-dialog>
 </div>

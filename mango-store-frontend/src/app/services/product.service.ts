@@ -122,7 +122,7 @@ export class ProductService {
               life: 5000
             });
           } else {
-            this.handleError('Failed to search products', 'Search error', error);
+            this.handleError('ไม่สามารถค้นหาสินค้าได้', 'เกิดข้อผิดพลาดใ', error);
           }
           return throwError(() => new Error('Failed to search products'));
         })

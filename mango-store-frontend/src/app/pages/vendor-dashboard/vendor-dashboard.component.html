@@ -1,6 +1,6 @@
 <p-messages></p-messages>
 
-<p-fieldset legend="Products" class="p-3">
+<p-fieldset legend="จัดการสินค้า" class="p-3">
   <p-confirmDialog header="ยืนยันการลบสินค้า" icon="pi pi-exclamation-triangle" />
   <div class="w-full flex justify-content-end">
     <div>
@@ -46,12 +46,12 @@
               </div>
               <div class="flex flex-column gap-2">
                 <div class="flex flex-row gap-2">
-                  <p-button icon="pi pi-pencil" label="แก้ไขข้อมูล" (onClick)="showEditProductDialog(item)" [style]="{ width: '12rem', 'margin-right': '0.5rem' }"></p-button>
-                  <p-button icon="pi pi-trash" severity="danger" label="ลบสินค้า" (onClick)="confirmToDelete(item.id)" [style]="{ width: '12rem' }"></p-button>
+                  <p-button icon="pi pi-pencil" label="แก้ไขข้อมูล" (onClick)="showEditProductDialog(item)" [style]="{ width: '9rem', 'margin-right': '0.5rem' }"></p-button>
+                  <p-button icon="pi pi-trash" severity="danger" label="ลบสินค้า" (onClick)="confirmToDelete(item.id)" [style]="{ width: '9rem' }"></p-button>
                 </div>
                 <div class="flex flex-row gap-2" *ngIf="item.promotion">
-                  <p-button icon="pi pi-tag" severity="info" label="แก้ไขโปรโมชั่น" (onClick)="showEditPromotionDialog(item)" [style]="{ width: '12rem', 'margin-right': '0.5rem' }"></p-button>
-                  <p-button icon="pi pi-times" severity="danger" label="ลบโปรโมชั่น" (onClick)="onDeletePromotion(item)" [style]="{ width: '12rem' }"></p-button>
+                  <p-button icon="pi pi-tag" severity="info" label="แก้ไขโปรโมชั่น" (onClick)="showEditPromotionDialog(item)" [style]="{ width: '9rem', 'margin-right': '0.5rem' }"></p-button>
+                  <p-button icon="pi pi-times" severity="danger" label="ลบโปรโมชั่น" (onClick)="onDeletePromotion(item)" [style]="{ width: '9rem' }"></p-button>
                 </div>
               </div>                                      
             </div>
@@ -134,7 +134,7 @@
 </p-dialog>
 
 <p-dialog header="แก้ไขข้อมูลสินค้า" [(visible)]="displayEditProductDialog" [modal]="true" [closable]="true" [style]="{width: '50vw'}" (onHide)="closeEditProductDialog()">
-  <form [formGroup]="editProductForm" (ngSubmit)="onEditProduct()">
+  <form [formGroup]="editProductForm" (ngSubmit)="onEditProduct()" class="p-2">
     <div class="p-fluid">
       <div class="p-field">
         <p-floatLabel>
@@ -257,7 +257,7 @@
 </p-dialog>
 
 <p-dialog header="แก้ไขโปรโมชั่น" [(visible)]="displayEditPromotionDialog" [modal]="true" [closable]="true" [style]="{width: '50vw'}" (onHide)="closeEditPromotionDialog()">
-  <form [formGroup]="editPromotionForm" (ngSubmit)="onEditPromotion()" class="p-2">
+  <form [formGroup]="editPromotionForm" (ngSubmit)="onEditPromotion()" class="p-3">
     <div class="p-fluid">
       <div class="p-field">
         <p-floatLabel>

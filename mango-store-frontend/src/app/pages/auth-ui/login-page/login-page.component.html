@@ -5,7 +5,7 @@
     animationDuration=".5s" />
 </div>
 
-  <div class="login-sandbox mt-1">
+  <div class="login-sandbox mt-1" (keydown.enter)="triggerSubmit()">
     <div class="inputField w-full p-3">
       <p-floatLabel>
         <input
@@ -34,6 +34,6 @@
     </div>
 
     <div class="p-3">
-      <p-button label="เข้าสู่ระบบ" (onClick)="login()" class="w-full" [style]="{ width: '100%' }"></p-button>
+      <p-button label="เข้าสู่ระบบ" (onClick)="login()" class="w-full" styleClass="main-button" [style]="{ width: '100%' }" ></p-button>
     </div>
   </div>

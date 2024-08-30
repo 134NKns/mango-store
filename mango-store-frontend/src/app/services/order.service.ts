@@ -120,8 +120,8 @@ export class OrderService {
       tap(() => {
         this.messageService.add({
           severity: 'success',
-          summary: 'Order Status Updated',
-          detail: 'The order status has been successfully updated.',
+          summary: 'อัปเดตสถานะคำสั่งซื้อ',
+          detail: 'สถานะคำสั่งซื้อถูกอัปเดตเรียบร้อยแล้ว',
           life: 5000
         });
       }),
@@ -129,8 +129,8 @@ export class OrderService {
         console.error('Failed to update order status', error); // Log error
         this.messageService.add({
           severity: 'error',
-          summary: 'Update Failed',
-          detail: 'Failed to update order status. Please try again.',
+          summary: 'การอัปเดตล้มเหลว',
+          detail: 'ไม่สามารถอัปเดตสถานะคำสั่งซื้อได้ กรุณาลองใหม่อีกครั้ง',
           life: 5000
         });
         return throwError(() => new Error('Failed to update order status'));
@@ -138,8 +138,6 @@ export class OrderService {
     );
   }
   
-  
-
   private handleError(error: HttpErrorResponse): Observable<never> {
     console.error('Error occurred:', error);
     return throwError(() => new Error('Something went wrong. Please try again later.'));

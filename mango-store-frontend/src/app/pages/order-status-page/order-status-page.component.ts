@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { OrderService } from '../../services/order.service';
 import { Order } from '../../model/order.model';
-import { MessageService } from 'primeng/api';
-import { Router } from '@angular/router';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
@@ -10,6 +10,9 @@ import { ButtonModule } from 'primeng/button';
 import { DropdownModule } from 'primeng/dropdown';
 import { DialogModule } from 'primeng/dialog';
 import { AuthService } from '../../services/auth.service';
+import { LoadingService } from '../../services/loading.service';
+import { CardModule } from 'primeng/card';
+import { ImageModule } from 'primeng/image';
 
 @Component({
   selector: 'app-order-status-page',
@@ -20,30 +23,35 @@ import { AuthService } from '../../services/auth.service';
     TableModule,
     ButtonModule,
     DropdownModule,
-    DialogModule
+    DialogModule,
+    CardModule,
+    ConfirmDialogModule,
+    ImageModule
   ],
   templateUrl: './order-status-page.component.html',
   styleUrls: ['./order-status-page.component.scss'],
-  providers: [MessageService]
+  providers: [MessageService,ConfirmationService]
 })
 export class OrderStatusPageComponent implements OnInit {
   orders: Order[] = [];
-  statuses: { label: string, value: string }[] = [
-    { label: 'Pending', value: 'pending' },
-    { label: 'Paid', value: 'paid' },
-    { label: 'Shipped', value: 'shipped' },
-    { label: 'Delivered', value: 'delivered' },
-    { label: 'Cancelled', value: 'cancelled' }
-  ];
-  selectedOrder: Order | null = null;
-  displayDialog: boolean = false;
-  userRole: string = ''; 
+  statuses: { label: string, value: string, disabled?: boolean }[] = [
+    { label: 'รอดำเนินการ', value: 'pending' },
+    { label: 'ชำระเงินแล้ว', value: 'paid' },
+    { label: 'จัดส่งแล้ว', value: 'shipped' },
+    { label: 'จัดส่งสำเร็จ', value: 'delivered' },
+    { label: 'ยกเลิกแล้ว', value: 'cancelled', disabled: true }
+];
 
+  selectedOrder: Order | null = null;
+  displaySlipDialog : boolean = false;
+  displayOrderDetailsModal : boolean = false;
+  userRole: string = ''; 
   constructor(
     private orderService: OrderService,
     private authService: AuthService,
     private messageService: MessageService,
-    private router: Router
+    private loadingService: LoadingService,
+    private confirmationService: ConfirmationService
   ) {}
 
   ngOnInit(): void {
@@ -52,51 +60,49 @@ export class OrderStatusPageComponent implements OnInit {
   }
 
   loadOrders(): void {
+    this.loadingService.show();
+    
+    const handleError = (error: any) => {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to load orders',
+      });
+      console.error('Failed to load orders', error);
+      this.loadingService.hide();
+    };
+  
     if (this.userRole === 'admin') {
       this.orderService.getAllOrders().subscribe({
         next: (orders) => {
           this.orders = orders;
+          this.loadingService.hide();
+          console.log(orders);
+          
         },
-        error: (error) => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'Failed to load orders',
-          });
-          console.error('Failed to load orders', error);
-        },
+        error: handleError,
       });
     } else if (this.userRole === 'vendor') {
       this.orderService.getOrdersForVendor().subscribe({
         next: (orders) => {
+          console.log(orders);
           this.orders = orders;
+          this.loadingService.hide();
         },
-        error: (error) => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'Failed to load orders',
-          });
-          console.error('Failed to load orders', error);
-        },
+        error: handleError,
       });
-    } else if (this.userRole === 'customer') {      
-      const userId = localStorage.getItem('user_id');       
+    } else if (this.userRole === 'customer') {
+      const userId = localStorage.getItem('user_id');
       this.orderService.getOrdersByUserId(Number(userId)).subscribe({
         next: (orders) => {
           this.orders = orders;
+          this.loadingService.hide();
         },
-        error: (error) => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'Failed to load orders',
-          });
-          console.error('Failed to load orders', error);
-        },
+        error: handleError,
       });
-    }
+    }    
   }
+  
 
   updateStatus(order: Order): void {
     console.log('Updating order status', order); // Log order data
@@ -104,30 +110,39 @@ export class OrderStatusPageComponent implements OnInit {
       next: () => {
         this.messageService.add({
           severity: 'success',
-          summary: 'Success',
-          detail: 'Order status updated successfully',
+          summary: 'สำเร็จ',
+          detail: 'อัปเดตสถานะคำสั่งซื้อเรียบร้อยแล้ว',
         });
       },
       error: (error) => {
         this.messageService.add({
           severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to update order status',
+          summary: 'ข้อผิดพลาด',
+          detail: 'ไม่สามารถอัปเดตสถานะคำสั่งซื้อได้',
         });
         console.error('Failed to update order status', error);
       },
     });
   }
+
   
   viewSlip(order: Order): void {
-    this.selectedOrder = order;
-    console.log('Selected order for slip:', order);
-    this.displayDialog = true;
+    this.selectedOrder = order; // Ensure the selectedOrder is set
+    this.displaySlipDialog = true; // Show the dialog
   }
 
   closeDialog(): void {
-    this.displayDialog = false;
+    this.displaySlipDialog = false;
     this.selectedOrder = null;
+  }
+
+  confirmCancel(order: Order) {
+    this.confirmationService.confirm({
+      message: 'คุณต้องการยกเลิกออเดอร์นี้ใช่หรือไม่',
+      header: 'ยืนยันการยกเลิกออเดอร์',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => this.deleteOrder(order)
+    });
   }
 
   deleteOrder(order: Order): void {
@@ -136,7 +151,7 @@ export class OrderStatusPageComponent implements OnInit {
         this.messageService.add({
           severity: 'success',
           summary: 'Success',
-          detail: 'Order cancelled successfully',
+          detail: 'ยกเลิกออเดอร์สมบูรณ์',
         });
         this.loadOrders(); 
       },
@@ -144,10 +159,14 @@ export class OrderStatusPageComponent implements OnInit {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'Failed to cancel order',
+          detail: 'ไม่สามารถยกเลิกออเดอร์นี้ได้',
         });
         console.error('Failed to cancel order', error);
       }
     });
+  }
+
+  viewOrderDetails(order:any){
+
   }
 }

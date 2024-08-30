@@ -1,29 +1,39 @@
-<div class="p-3">
-  <div class="flex justify-content-center align-items-center mb-4 gap-3">
+<div class="p-3 w-full flex flex-column align-items-center justify-content-center">
+  <!-- Search and Refresh -->
+  <div class="flex justify-content-center align-items-center mb-4 gap-3 w-full max-w-6xl p-3">
     <span class="p-input-icon-left w-50">
       <i class="pi pi-search"></i>
       <input 
         type="text" 
         pInputText 
         [(ngModel)]="searchValue" 
-        (input)="onSearchInputChange()"
-        placeholder="ค้นหาสินค้า"
+        (input)="onSearchInputChange()" 
+        placeholder="ค้นหาสินค้า" 
         class="w-full"
       />
     </span>
-    <button pButton type="button" icon="pi pi-refresh" class="p-button-outlined" (click)="refreshProducts()"></button>
+    <button pButton type="button" icon="pi pi-refresh" style="min-width:50px;" class="p-button-outlined custom-button" (click)="refreshProducts()"></button>
   </div>
 
-  <div *ngIf="products.length === 0" class="flex justify-content-center align-items-center no-products">
+  <div class="hr-with-icon w-full">
+    <hr>
+    <span class="icon">🍋</span> <!-- ใช้ไอคอนมะม่วงหรืออื่นๆ -->
+    <hr>
+  </div>
+
+  <!-- No Products Message -->
+  <div *ngIf="products.length === 0" class="flex justify-content-center align-items-center text-center w-full h-full">
     ไม่พบสินค้า
   </div>
 
-  <div *ngIf="products.length > 0" class="grid">
-    <div *ngFor="let product of displayedProducts" class="col-12 sm:col-6 md:col-4 lg:col-3 p-2">
-      <p-card [header]="product.name" class="product-card h-full">
+  <!-- Products Grid -->
+  <div *ngIf="products.length > 0" class="grid w-full max-w-6xl p-3">
+    <div *ngFor="let product of displayedProducts" class="col-12 sm:col-6 md:col-4 lg:col-3">
+      <p-card [header]="product.name" class="h-full">
         <ng-template pTemplate="header">
           <div class="image-wrapper">
-            <p-image 
+            <p-image
+              styleClass="{height:100% !important;}"
               [src]="product.images[0]?.image_data || '../../assets/images/no-image.png'" 
               alt="Card" 
               [preview]="true">
@@ -31,55 +41,87 @@
           </div>
         </ng-template>
         <div class="flex justify-content-between align-items-center mt-2">
-          <h3 class="text-right m-0">{{product.price}} บาท</h3>
+          <h3 class="m-0"><span class="text-teal-500">{{product.price}}</span> บาท</h3>
         </div>
         <ng-template pTemplate="footer">
-          <div class="flex flex-column gap-3 mt-1 w-full">
+          <div class="flex flex-column gap-2 mt-2">
             <p-button 
               label="รายละเอียดสินค้า" 
+              styleClass="infoButton"
               icon="pi pi-info-circle" 
               severity="info" 
-              [style]="{ width: '100%' }" 
-              class="w-full p-button-sm text-sm" 
+              class="w-full p-button-sm" 
+              [style]="{ width: '100%' }"
               (click)="showProductDetails(product)"
             />
             <p-button 
               label="เพิ่มเข้าตะกร้า" 
+              styleClass="addButton"
               icon="pi pi-shopping-cart" 
               severity="success" 
-              [style]="{ width: '100%' }" 
-              class="w-full p-button-sm text-sm" 
-              (click)="addToCart(product)"
+              class="w-full p-button-sm" 
+              (click)="addToCart(product)" 
+              [style]="{ width: '100%' }"
+              [disabled]="userRole && userRole !== 'customer'"
             />
           </div>                      
         </ng-template>
       </p-card>
     </div>
   </div>
+
+  <div class="hr-with-icon w-full">
+    <hr>
+    <span class="icon">🍋</span> <!-- ใช้ไอคอนมะม่วงหรืออื่นๆ -->
+    <hr>
+  </div>
+  
+
+  <!-- Pagination -->
   <p-paginator 
     *ngIf="products.length > 0" 
     [rows]="productsPerPage" 
     [totalRecords]="products.length" 
     (onPageChange)="onPageChange($event)" 
-    class="mt-4">
+    class="mt-4 p-3">
   </p-paginator>
 
-  <p-dialog header="รายละเอียดสินค้า" [(visible)]="displayDialog" [modal]="true" [closable]="true" [responsive]="true" [breakpoints]="{'960px': '75vw', '640px': '90vw'}" [style]="{width: '40vw'}">
-    <ng-template pTemplate="content">
-      <div *ngIf="selectedProduct">
-        <h2>{{ selectedProduct.name }}</h2>
-        <div *ngFor="let image of selectedProduct.images" class="flex justify-content-center mb-2">
-          <p-image [src]="image.image_data" alt="Product Image" width="400" [preview]="true"></p-image>
-        </div>
-        <h3>{{ selectedProduct.price }} บาท</h3>
-        <p>{{ selectedProduct.description }}</p>
+<!-- Product Details Dialog -->
+<!-- Product Details Dialog -->
+<p-dialog header="รายละเอียดสินค้า" [(visible)]="displayDialog" [modal]="true" [closable]="true" [responsive]="true" [breakpoints]="{'960px': '75vw', '640px': '90vw'}" [style]="{width: '40vw'}">
+  <ng-template pTemplate="content">
+    <div *ngIf="selectedProduct">
+      <h2>{{ selectedProduct.name }}</h2>
+      <hr class="section-divider">
+      
+      <div *ngFor="let image of selectedProduct.images" class="flex justify-content-center mb-2 p-3">
+        <p-image [src]="image.image_data" alt="Product Image" width="400"></p-image>
       </div>
-    </ng-template>
-    <ng-template pTemplate="footer">
-      <p-button label="Close" icon="pi pi-times" (click)="displayDialog = false"></p-button>
-    </ng-template>
-  </p-dialog>
+      
+      <hr class="section-divider">
 
+      <p>{{ selectedProduct.description }}</p>
+      
+      <hr class="section-divider">
+      
+      <div *ngIf="selectedProduct.promotion" class="promotion-details p-2 w-full">
+        <h3 class="text-red-500">โปรโมชั่น: {{ selectedProduct.promotion.promotion_type }}</h3>
+        <p>ลดราคา: <span class="text-red-500">{{ selectedProduct.promotion.discount_value }}%</span></p>
+        <p>ช่วงเวลาโปรโมชั่น: {{ selectedProduct.promotion.start_date | date:'dd/MM/yyyy' }} - {{ selectedProduct.promotion.end_date | date:'dd/MM/yyyy' }}</p>
+        <p *ngIf="selectedProduct.promotion.description">รายละเอียดโปรโมชั่น: {{ selectedProduct.promotion.description }}</p>
+        <hr class="section-divider">
+      </div>
+      
+      <div class="flex justify-content-end w-full">
+        <h3 class="align-self-end">ราคา <span class="text-teal-500">{{ selectedProduct.price }}</span> บาท</h3>
+      </div>        
+    </div>
+  </ng-template>
+</p-dialog>
+
+
+
+  <!-- Login Dialog -->
   <p-dialog header="กรุณาล็อกอิน" [(visible)]="displayLoginDialog" [modal]="true" [closable]="true" [responsive]="true" [breakpoints]="{'960px': '75vw', '640px': '90vw'}" [style]="{width: '30vw'}">
     <ng-template pTemplate="content">
       <p>กรุณาล็อกอินหรือสมัครสมาชิกก่อนทำการเพิ่มสินค้าลงในตะกร้า</p>
@@ -89,19 +131,20 @@
     </ng-template>
   </p-dialog>
 
+  <!-- Add to Cart Dialog -->
   <p-dialog header="เพิ่มสินค้าลงในตะกร้า" [(visible)]="displayAddToCartDialog" [modal]="true" [closable]="true" [responsive]="true" [breakpoints]="{'960px': '75vw', '640px': '90vw'}" [style]="{width: '30vw'}">
     <ng-template pTemplate="content">
       <div *ngIf="selectedProduct" class="p-fluid">
-        <div class="p-d-flex p-flex-column p-ai-center">
-          <div class="image-container" [style]="{width: '100%', maxHeight: '300px', overflow: 'hidden'}">
+        <div class="flex flex-column align-items-center">
+          <div class="image-container text-center" style="width: 100%; max-height: 300px; overflow: hidden;">
             <p-image 
               [src]="selectedProduct.images[0]?.image_data || '../../assets/images/no-image.png'" 
               alt="Product Image" 
-              [style]="{width: '100%', height: '100%', objectFit: 'contain'}">
+              width="300">
             </p-image>
           </div>
-          <h3 class="p-mt-2 p-text-center" [style]="{ 'font-size': '1.2em' }">{{ selectedProduct.name }}</h3>
-          <h4 class="p-mt-1">{{ selectedProduct.price }} บาท</h4>
+          <h3 class="mt-2 text-center" style="font-size: 1.2em;">{{ selectedProduct.name }}</h3>
+          <h4 class="mt-1">{{ selectedProduct.price }} บาท</h4>
           <p>กรุณาระบุจำนวนที่ต้องการเพิ่มลงในตะกร้า (มีสินค้าคงเหลือ: {{ selectedProduct.stock }})</p>
           <p-inputNumber 
             [(ngModel)]="quantity" 
@@ -110,17 +153,16 @@
             inputId="minmax-buttons" 
             [min]="1" 
             [max]="selectedProduct.stock" 
-            class="w-full" 
-            [style]="{ width: '100%' }">
+            class="w-full">
           </p-inputNumber>
           <p>กรุณาระบุที่อยู่จัดส่ง:</p>
-          <input type="text" pInputText [(ngModel)]="shippingAddress" class="w-full" [style]="{ width: '100%' }"/>
+          <input type="text" pInputText [(ngModel)]="shippingAddress" class="w-full"/>
         </div>
       </div>
     </ng-template>
     <ng-template pTemplate="footer">
-      <div class="p-d-flex p-jc-end">
-        <p-button label="ยืนยัน" icon="pi pi-check" class="p-mr-2" (click)="confirmAddToCart()"></p-button>
+      <div class="flex justify-content-end">
+        <p-button label="ยืนยัน" icon="pi pi-check" class="mr-2" (click)="confirmAddToCart()"></p-button>
         <p-button label="ยกเลิก" icon="pi pi-times" (click)="displayAddToCartDialog = false" severity="danger"></p-button>
       </div>
     </ng-template>

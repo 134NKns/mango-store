@@ -28,6 +28,8 @@ import { AuthService } from '../../services/auth.service';
 import { CheckboxModule } from 'primeng/checkbox';
 import { DropdownModule } from 'primeng/dropdown';
 import { CalendarModule } from 'primeng/calendar';
+import { LoadingService } from '../../services/loading.service';
+
 
 @Component({
   selector: 'app-vendor-dashboard',
@@ -96,7 +98,8 @@ export class VendorDashboardComponent implements OnInit {
     private promotionService: PromotionService,
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
-    private authService: AuthService
+    private authService: AuthService,
+    private loadingService: LoadingService
   ) {
     this.vendor_id = localStorage.getItem('user_id');
     this.addProductForm = this.fb.group({
@@ -151,6 +154,7 @@ export class VendorDashboardComponent implements OnInit {
   loadProducts() {
     const vendorId = this.vendor_id ?? undefined;
     const role = this.authService.getRole();
+    this.loadingService.show();
     if (role === 'admin') {
       this.productService.searchProducts({}).subscribe({
         next: (products) => {
@@ -447,6 +451,7 @@ export class VendorDashboardComponent implements OnInit {
     const startIndex = this.first;
     const endIndex = this.first + this.rows;
     this.paginatedProducts = this.products.slice(startIndex, endIndex);
+    this.loadingService.hide();
   }
 
   onPageChange(event: any) {

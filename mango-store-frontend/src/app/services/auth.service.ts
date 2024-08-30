@@ -50,10 +50,20 @@ export class AuthService {
   private tokenExpirationTimeout: any;
 
   constructor(private http: HttpClient, private router: Router, private messageService: MessageService) { 
-    this.attemptAutoLogin();  // Check for token and auto-login on service initialization
+    this.attemptAutoLogin();  // Attempt auto-login on service initialization
   }
 
-  login(username: string, password: string): Observable<UserLoginResponse> {
+  login(username: string | null, password: string | null): Observable<UserLoginResponse> {
+    if (!username) {
+      this.messageService.add({ severity: 'error', summary: 'Login Error', detail: 'กรุณากรอกชื่อผู้ใช้', life: 5000 });
+      return throwError(() => new Error('กรุณากรอกชื่อผู้ใช้'));
+    }
+    
+    if (!password) {
+      this.messageService.add({ severity: 'error', summary: 'Login Error', detail: 'กรุณากรอกรหัสผ่าน', life: 5000 });
+      return throwError(() => new Error('กรุณากรอกรหัสผ่าน'));
+    }
+  
     return this.http.post<UserLoginResponse>(API_URLS.login, { username, password })
       .pipe(
         map(response => {          
@@ -62,7 +72,7 @@ export class AuthService {
         }),
         catchError(error => this.handleError(error, 'Login'))
       );
-  }
+  }  
 
   register(userDetails: UserRegister): Observable<any> {
     return this.http.post<any>(API_URLS.register, userDetails)
@@ -83,7 +93,7 @@ export class AuthService {
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`
     });
-    return this.http.post<UserInfoResponse>(API_URLS.me, {}, { headers });  // Correctly set headers as options
+    return this.http.post<UserInfoResponse>(API_URLS.me, {}, { headers });
   }
 
   private handleAuthentication(response: UserLoginResponse): void {
@@ -95,7 +105,6 @@ export class AuthService {
     const encryptedRole = this.encrypt(response.user.role.toLowerCase());
     this.storeCredentialsInLocalStorage('role', encryptedRole);
 
-    // Calculate and store the expiry timestamp in seconds
     const expiryTimestamp = Math.floor(Date.now() / 1000) + response.expires_in;
     this.storeCredentialsInLocalStorage('expires_in', expiryTimestamp.toString());
 
@@ -138,22 +147,21 @@ export class AuthService {
   }
 
   logout(): void {
-    this.router.navigate(['/']);
     localStorage.clear();  // Clears all data from local storage
     this.token = null;
     this.roleSubject.next(null);
     if (this.tokenExpirationTimeout) {
       clearTimeout(this.tokenExpirationTimeout);
     }
-    // No redirection here, handling redirection can be done elsewhere if needed
+    this.router.navigate(['/']);
   }
 
   private handleError(error: HttpErrorResponse, context: string): Observable<never> {
-    let message = `${context} failed due to server error`;
+    let message = `${context} เกิดความผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์`;
     if (error.status === 401) {
-      message = 'Invalid username or password';
+      message = 'ชื่อผู้ใช้หรือรหัสผ่านผิด';
     } else if (!navigator.onLine) {
-      message = 'No internet connection';
+      message = 'ไม่สามารถเชื่อมต่อได้';
     }
     this.messageService.add({ severity: 'error', summary: `${context} Error`, detail: message, life: 5000 });
     return throwError(() => new Error(message));
@@ -173,11 +181,9 @@ export class AuthService {
 
   updateProfile(userProfile: UserProfile, userId: number): Observable<UserProfile> {
     const token = this.getFromLocalStorage('token');
-    console.log('Token retrieved:', token);
-  
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`,
-      'X-HTTP-Method-Override': 'PUT'  // This indicates that the method is treated as PUT
+      'X-HTTP-Method-Override': 'PUT'
     });
   
     const body = {
@@ -189,13 +195,10 @@ export class AuthService {
     };
   
     const url = `${API_URLS.update_user_profile}/${userId}`;
-    console.log('Update URL:', url);
-    console.log('Request body:', body);
   
     return this.http.post<UserProfile>(url, body, { headers })
       .pipe(
         tap(() => {
-          console.log('success update product');
           this.messageService.add({
             severity: 'success',
             summary: 'Profile Updated',
@@ -203,18 +206,15 @@ export class AuthService {
             life: 5000
           });
         }),
-        catchError(error => {
-          console.error('Error in updateProfile:', error);
-          return this.handleError(error, 'Update Profile');
-        })
+        catchError(error => this.handleError(error, 'Update Profile'))
       );
   }
-  
+
   updateVendorDetail(vendorDetail: VendorDetail, userId: number): Observable<VendorDetail> {
     const token = this.getFromLocalStorage('token');
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`,
-      'X-HTTP-Method-Override': 'PUT'  // This indicates that the method is treated as PUT
+      'X-HTTP-Method-Override': 'PUT'
     });
   
     const body = {
@@ -231,7 +231,6 @@ export class AuthService {
         catchError(error => this.handleError(error, 'Update Vendor Detail'))
       );
   }
-  
 
   private encrypt(text: string): string {
     return CryptoJS.AES.encrypt(text, this.secretKey).toString();

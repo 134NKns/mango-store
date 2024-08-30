@@ -10,7 +10,7 @@ export interface Product {
   is_available: boolean;
   images: ProductImage[];
   promotion: Promotion | null;
-  selected?: boolean; // Optional property for selection
+  selected?: boolean;
 }
 
 export interface ProductImage {

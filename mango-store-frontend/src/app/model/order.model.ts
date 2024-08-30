@@ -1,8 +1,10 @@
 import { Product } from "./product.model";
+import { UserProfile } from "./user.model";
 
 export interface Order {
     id: number;
     user_id: number;
+    user_profile : UserProfile;
     total_price: number;
     payment_slip?: string; 
     status: string;

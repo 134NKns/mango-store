@@ -5,206 +5,224 @@
     animationDuration=".5s" />
 </div>
 
-<form #registerForm="ngForm" (ngSubmit)="registerSubmit(registerForm)">
+<form #registerForm="ngForm" (ngSubmit)="registerSubmit(registerForm)" (keydown.enter)="triggerSubmit(registerForm)">
   <div class="register-sandbox mt-1">
-    <div class="inputField w-full p-3">
-      <p-floatLabel>
-        <input
-          pInputText
-          id="username"
-          name="username"
-          [(ngModel)]="userDetails.username"
-          required
-          autocomplete="new-password"
-          [pattern]="usernamePattern"
-          [style]="{ width: '100%' }"
-        />
-        <label for="username">ชื่อผู้ใช้สำหรับเข้าสู่ระบบ</label>
-      </p-floatLabel>
-      <div *ngIf="registerForm.controls['username']?.touched && registerForm.controls['username']?.errors" class="error-message mt-1">
-        <small *ngIf="registerForm.controls['username']?.errors?.['required']" class="text-red-500">
-          ชื่อผู้ใช้จำเป็นต้องใส่
-        </small>
-        <small *ngIf="registerForm.controls['username']?.errors?.['pattern']" class="text-red-500">
-          ชื่อผู้ใช้สามารถใช้ได้เฉพาะภาษาอังกฤษ ตัวเลข และอักขระพิเศษเท่านั้น
-        </small>
+    <div class="flex flex-wrap">
+      <!-- Username and Email -->
+      <div class="inputField w-full md:w-6 p-3">
+        <p-floatLabel>
+          <input
+            pInputText
+            id="username"
+            name="username"
+            [(ngModel)]="userDetails.username"
+            required
+            autocomplete="new-password"
+            [pattern]="usernamePattern"
+            [style]="{ width: '100%' }"
+          />
+          <label for="username">ชื่อผู้ใช้สำหรับเข้าสู่ระบบ</label>
+        </p-floatLabel>
+        <div *ngIf="registerForm.controls['username']?.touched && registerForm.controls['username']?.errors" class="error-message mt-1">
+          <small *ngIf="registerForm.controls['username']?.errors?.['required']" class="text-red-500">
+            ชื่อผู้ใช้จำเป็นต้องใส่
+          </small>
+          <small *ngIf="registerForm.controls['username']?.errors?.['pattern']" class="text-red-500">
+            ชื่อผู้ใช้สามารถใช้ได้เฉพาะภาษาอังกฤษ ตัวเลข และอักขระพิเศษเท่านั้น
+          </small>
+        </div>
+      </div>
+
+      <div class="inputField w-full md:w-6 p-3">
+        <p-floatLabel>
+          <input
+            pInputText
+            id="email"
+            name="email"
+            [(ngModel)]="userDetails.email"
+            required
+            email
+            [style]="{ width: '100%' }"
+          />
+          <label for="email">อีเมล</label>
+        </p-floatLabel>
+        <div *ngIf="registerForm.controls['email']?.touched && registerForm.controls['email']?.errors" class="error-message mt-1">
+          <small *ngIf="registerForm.controls['email']?.errors?.['required']" class="text-red-500">
+            อีเมลจำเป็นต้องใส่
+          </small>
+          <small *ngIf="registerForm.controls['email']?.errors?.['email']" class="text-red-500">
+            อีเมลไม่ถูกต้อง
+          </small>
+        </div>
       </div>
     </div>
 
-    <div class="inputField w-full p-3">
-      <p-floatLabel>
-        <p-password
-          id="password"
-          name="password"
-          [(ngModel)]="userDetails.password"
-          required
-          [toggleMask]="true"
-          autocomplete="new-password"
-          [pattern]="passwordPattern"
-          [style]="{ width: '100%' }"
-          [inputStyle]="{ width: '100%' }"
-        />
-        <label for="password">รหัสผ่าน</label>
-      </p-floatLabel>
-      <div *ngIf="registerForm.controls['password']?.touched && registerForm.controls['password']?.errors" class="error-message mt-1">
-        <small *ngIf="registerForm.controls['password']?.errors?.['required']" class="text-red-500">
-          รหัสผ่านจำเป็นต้องใส่
-        </small>
-        <small *ngIf="registerForm.controls['password']?.errors?.['pattern']" class="text-red-500">
-          รหัสผ่านสามารถใช้ได้เฉพาะภาษาอังกฤษ ตัวเลข และอักขระพิเศษเท่านั้น
-        </small>
+    <div class="flex flex-wrap">
+      <!-- Password and Confirm Password -->
+      <div class="inputField w-full md:w-6 p-3">
+        <p-floatLabel>
+          <p-password
+            id="password"
+            name="password"
+            [(ngModel)]="userDetails.password"
+            required
+            [toggleMask]="true"
+            autocomplete="new-password"
+            [pattern]="passwordPattern"
+            [style]="{ width: '100%' }"
+            [inputStyle]="{ width: '100%' }"
+          />
+          <label for="password">รหัสผ่าน</label>
+        </p-floatLabel>
+        <div *ngIf="registerForm.controls['password']?.touched && registerForm.controls['password']?.errors" class="error-message mt-1">
+          <small *ngIf="registerForm.controls['password']?.errors?.['required']" class="text-red-500">
+            รหัสผ่านจำเป็นต้องใส่
+          </small>
+          <small *ngIf="registerForm.controls['password']?.errors?.['pattern']" class="text-red-500">
+            รหัสผ่านสามารถใช้ได้เฉพาะภาษาอังกฤษ ตัวเลข และอักขระพิเศษเท่านั้น
+          </small>
+        </div>
+      </div>
+
+      <div class="inputField w-full md:w-6 p-3">
+        <p-floatLabel>
+          <p-password
+            id="password_confirmation"
+            name="password_confirmation"
+            [(ngModel)]="userDetails.password_confirmation"
+            required
+            [feedback]="false"
+            [toggleMask]="true"
+            autocomplete="new-password"
+            [style]="{ width: '100%' }"
+            [inputStyle]="{ width: '100%' }"
+            (ngModelChange)="isMatchPassword()"
+          />
+          <label for="password_confirmation">ยืนยันรหัสผ่าน</label>
+        </p-floatLabel>
+        <div *ngIf="!passwordMatch" class="error-message mt-1">
+          <small id="password-warning" class="p-1 text-red-500">
+            รหัสผ่านไม่ตรงกัน
+          </small>
+        </div>
       </div>
     </div>
 
-    <div class="inputField w-full p-3">
-      <p-floatLabel>
-        <p-password
-          id="password_confirmation"
-          name="password_confirmation"
-          [(ngModel)]="userDetails.password_confirmation"
-          required
-          [feedback]="false"
-          [toggleMask]="true"
-          autocomplete="new-password"
-          [style]="{ width: '100%' }"
-          [inputStyle]="{ width: '100%' }"
-          (ngModelChange)="isMatchPassword()"
-        />
-        <label for="password_confirmation">ยืนยันรหัสผ่าน</label>
-      </p-floatLabel>
-      <div *ngIf="!passwordMatch" class="error-message mt-1">
-        <small id="password-warning" class="p-1 text-red-500">
-          รหัสผ่านไม่ตรงกัน
-        </small>
+    <div class="flex flex-wrap">
+      <!-- Firstname and Lastname -->
+      <div class="inputField w-full md:w-6 p-3">
+        <p-floatLabel>
+          <input
+            pInputText
+            id="firstname"
+            name="firstname"
+            [(ngModel)]="userDetails.firstname"
+            required
+            [style]="{ width: '100%' }"
+          />
+          <label for="firstname">ชื่อจริง</label>
+        </p-floatLabel>
+        <div *ngIf="registerForm.controls['firstname']?.touched && registerForm.controls['firstname']?.errors" class="error-message mt-1">
+          <small *ngIf="registerForm.controls['firstname']?.errors?.['required']" class="text-red-500">
+            ชื่อจริงจำเป็นต้องใส่
+          </small>
+        </div>
+      </div>
+
+      <div class="inputField w-full md:w-6 p-3">
+        <p-floatLabel>
+          <input
+            pInputText
+            id="lastname"
+            name="lastname"
+            [(ngModel)]="userDetails.lastname"
+            required
+            [style]="{ width: '100%' }"
+          />
+          <label for="lastname">นามสกุล</label>
+        </p-floatLabel>
+        <div *ngIf="registerForm.controls['lastname']?.touched && registerForm.controls['lastname']?.errors" class="error-message mt-1">
+          <small *ngIf="registerForm.controls['lastname']?.errors?.['required']" class="text-red-500">
+            นามสกุลจำเป็นต้องใส่
+          </small>
+        </div>
       </div>
     </div>
 
-    <div class="inputField w-full p-3">
-      <p-floatLabel>
-        <input
-          pInputText
-          id="email"
-          name="email"
-          [(ngModel)]="userDetails.email"
-          required
-          email
-          [style]="{ width: '100%' }"
-        />
-        <label for="email">อีเมล</label>
-      </p-floatLabel>
-      <div *ngIf="registerForm.controls['email']?.touched && registerForm.controls['email']?.errors" class="error-message mt-1">
-        <small *ngIf="registerForm.controls['email']?.errors?.['required']" class="text-red-500">
-          อีเมลจำเป็นต้องใส่
-        </small>
-        <small *ngIf="registerForm.controls['email']?.errors?.['email']" class="text-red-500">
-          อีเมลไม่ถูกต้อง
-        </small>
+    <div class="flex flex-wrap">
+      <!-- Address and Phone -->
+      <div class="inputField w-full md:w-6 p-3">
+        <p-floatLabel>
+          <input
+            pInputText
+            id="address"
+            name="address"
+            [(ngModel)]="userDetails.address"
+            required
+            [style]="{ width: '100%' }"
+          />
+          <label for="address">ที่อยู่</label>
+        </p-floatLabel>
+        <div *ngIf="registerForm.controls['address']?.touched && registerForm.controls['address']?.errors" class="error-message mt-1">
+          <small *ngIf="registerForm.controls['address']?.errors?.['required']" class="text-red-500">
+            ที่อยู่จำเป็นต้องใส่
+          </small>
+        </div>
       </div>
-    </div>
 
-    <div class="inputField w-full p-3">
-      <p-floatLabel>
-        <input
-          pInputText
-          id="firstname"
-          name="firstname"
-          [(ngModel)]="userDetails.firstname"
-          required
-          [style]="{ width: '100%' }"
-        />
-        <label for="firstname">ชื่อจริง</label>
-      </p-floatLabel>
-      <div *ngIf="registerForm.controls['firstname']?.touched && registerForm.controls['firstname']?.errors" class="error-message mt-1">
-        <small *ngIf="registerForm.controls['firstname']?.errors?.['required']" class="text-red-500">
-          ชื่อจริงจำเป็นต้องใส่
-        </small>
-      </div>
-    </div>
-
-    <div class="inputField w-full p-3">
-      <p-floatLabel>
-        <input
-          pInputText
-          id="lastname"
-          name="lastname"
-          [(ngModel)]="userDetails.lastname"
-          required
-          [style]="{ width: '100%' }"
-        />
-        <label for="lastname">นามสกุล</label>
-      </p-floatLabel>
-      <div *ngIf="registerForm.controls['lastname']?.touched && registerForm.controls['lastname']?.errors" class="error-message mt-1">
-        <small *ngIf="registerForm.controls['lastname']?.errors?.['required']" class="text-red-500">
-          นามสกุลจำเป็นต้องใส่
-        </small>
-      </div>
-    </div>
-
-    <div class="inputField w-full p-3">
-      <p-floatLabel>
-        <input
-          pInputText
-          id="address"
-          name="address"
-          [(ngModel)]="userDetails.address"
-          required
-          [style]="{ width: '100%' }"
-        />
-        <label for="address">ที่อยู่</label>
-      </p-floatLabel>
-      <div *ngIf="registerForm.controls['address']?.touched && registerForm.controls['address']?.errors" class="error-message mt-1">
-        <small *ngIf="registerForm.controls['address']?.errors?.['required']" class="text-red-500">
-          ที่อยู่จำเป็นต้องใส่
-        </small>
-      </div>
-    </div>
-
-    <div class="inputField w-full p-3">
-      <p-floatLabel>
-        <input
-          pInputText
-          id="phone"
-          name="phone"
-          [(ngModel)]="userDetails.phone"
-          required
-          [style]="{ width: '100%' }"
-        />
-        <label for="phone">โทรศัพท์</label>
-      </p-floatLabel>
-      <div *ngIf="registerForm.controls['phone']?.touched && registerForm.controls['phone']?.errors" class="error-message mt-1">
-        <small *ngIf="registerForm.controls['phone']?.errors?.['required']" class="text-red-500">
-          โทรศัพท์จำเป็นต้องใส่
-        </small>
+      <div class="inputField w-full md:w-6 p-3">
+        <p-floatLabel>
+          <input
+            pInputText
+            id="phone"
+            name="phone"
+            [(ngModel)]="userDetails.phone"
+            required
+            [style]="{ width: '100%' }"
+          />
+          <label for="phone">โทรศัพท์</label>
+        </p-floatLabel>
+        <div *ngIf="registerForm.controls['phone']?.touched && registerForm.controls['phone']?.errors" class="error-message mt-1">
+          <small *ngIf="registerForm.controls['phone']?.errors?.['required']" class="text-red-500">
+            โทรศัพท์จำเป็นต้องใส่
+          </small>
+        </div>
       </div>
     </div>
 
     <ng-container *ngIf="role == 'vendor'">
-      <div class="inputField w-full p-3">
-        <p-floatLabel>
-          <input
-            pInputText
-            id="store_name"
-            name="store_name"
-            [(ngModel)]="userDetails.store_name"
-            required
-            autocomplete="new-password"
+      <div class="flex flex-wrap">
+        <!-- Store Name and Bank Selection -->
+        <div class="inputField w-full md:w-6 p-3">
+          <p-floatLabel>
+            <input
+              pInputText
+              id="store_name"
+              name="store_name"
+              [(ngModel)]="userDetails.store_name"
+              required
+              autocomplete="new-password"
+              [style]="{ width: '100%' }"
+            />
+            <label for="store_name">ชื่อร้านค้า</label>
+          </p-floatLabel>
+        </div>
+        
+        <div class="inputField w-full md:w-6 p-3">
+          <p-dropdown 
+            [options]="banks" 
+            [(ngModel)]="selectedBank" 
+            optionLabel="label" 
+            autoWidth="false"
+            placeholder="ธนาคาร"
+            (ngModelChange)="onBankChange($event)"
             [style]="{ width: '100%' }"
+            name="bank_name"
           />
-          <label for="username">ชื่อร้านค้า</label>
-        </p-floatLabel>
+        </div>
       </div>
-      <div class="inputField w-full p-3">
-        <p-dropdown 
-          [options]="banks" 
-          [(ngModel)]="selectedBank" 
-          optionLabel="label" 
-          autoWidth="false"
-          placeholder="ธนาคาร"
-          (ngModelChange)="onBankChange($event)"
-          [style]="{ width: '100%' }"
-          name="bank_name"
-        />
-      </div>
+
+      <!-- PromptPay Number -->
       <div class="inputField w-full p-3">
         <p-floatLabel>
           <input
@@ -221,10 +239,10 @@
         </p-floatLabel>
       </div>
     </ng-container>
-  
-
+    
+    <!-- Submit Button -->
     <div class="p-3">
-      <button pButton type="submit" label="ลงทะเบียน" [style]="{ width: '100%' }" [disabled]="!passwordMatch || !registerForm.valid"></button>
+      <button pButton type="submit" label="ลงทะเบียน" [style]="{ width: '100%' }"  class="main-button" [disabled]="!passwordMatch || !registerForm.valid"></button>
     </div>
   </div>
 </form>

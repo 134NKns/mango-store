@@ -126,4 +126,8 @@ export class RegisterPageComponent implements OnChanges {
       }
     );
   }
+
+  triggerSubmit(registerForm: NgForm){
+    this.registerSubmit(registerForm);
+  }
 }

@@ -1,6 +1,6 @@
-<div class="p-grid p-dir-col p-ai-center p-jc-center full-height">
+<div class="pt-3 w-full h-full flex flex-column">
   <div class="p-col-12 p-md-10">
-    <p-table [value]="carts" [tableStyle]="{ 'min-width': '50rem' }" responsiveLayout="scroll" emptyMessage="ไม่มีข้อมูลสินค้า">
+    <p-table [value]="carts" [tableStyle]="{ 'min-width': '50rem' , 'min-height' : '100vh'}" responsiveLayout="scroll" emptyMessage="ไม่มีข้อมูลสินค้า">
       <ng-template pTemplate="header">
         <tr>
           <th>ชื่อสินค้า</th>
@@ -8,7 +8,7 @@
           <th>จำนวน</th>
           <th>ส่วนลด</th>
           <th>รวม</th>
-          <th></th>
+        <th></th>
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-cart>
@@ -48,7 +48,7 @@
           <td colspan="4" class="text-right"><strong>รวมทั้งหมด</strong></td>
           <td>{{ getTotalAmount() | currency:'THB':'symbol':'1.2-2' }}</td>
           <td>
-            <button pButton type="button" label="ชำระเงิน" icon="pi pi-shopping-cart" class="p-button-primary" [disabled]="isCartEmpty()" (click)="checkout()"></button>
+            <button pButton type="button" label="ชำระเงิน" icon="pi pi-shopping-cart" class="p-button-primary main-button" styleClass="main-button" [disabled]="isCartEmpty()" (click)="checkout()"></button>
           </td>
         </tr>
       </ng-template>

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
@@ -7,14 +7,16 @@ import { FormsModule } from '@angular/forms';
 import { ProductService } from '../../services/product.service';
 import { Product } from '../../model/product.model';
 import { CommonModule } from '@angular/common';
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { PaginatorModule } from 'primeng/paginator';
 import { ImageModule } from 'primeng/image';
 import { LoadingService } from '../../services/loading.service';
 import { DialogModule } from 'primeng/dialog';
-import { CartService } from '../../services/cart.service'; // Import CartService
-import { MessageService } from 'primeng/api'; // Import MessageService
+import { CartService } from '../../services/cart.service';
+import { MessageService } from 'primeng/api';
+import { AuthService } from '../../services/auth.service';
+import { DividerModule } from 'primeng/divider';
 
 @Component({
   selector: 'app-home-page',
@@ -28,13 +30,14 @@ import { MessageService } from 'primeng/api'; // Import MessageService
     HttpClientModule,
     PaginatorModule,
     ImageModule,
-    DialogModule
+    DialogModule,
+    DividerModule
   ],
   templateUrl: './home-page.component.html',
   styleUrls: ['./home-page.component.scss'],
-  providers: [MessageService] // Add MessageService to providers
+  providers: [MessageService]
 })
-export class HomePageComponent implements OnInit {
+export class HomePageComponent implements OnInit, OnDestroy {
   searchValue: string = '';
   products: Product[] = [];
   displayedProducts: Product[] = [];
@@ -43,26 +46,39 @@ export class HomePageComponent implements OnInit {
   productsPerPage: number = 10;
   displayDialog: boolean = false;
   displayLoginDialog: boolean = false;
-  displayAddToCartDialog: boolean = false; // Add displayAddToCartDialog
+  displayAddToCartDialog: boolean = false;
   selectedProduct: Product | null = null;
-  quantity: number = 1; // Add quantity
-  shippingAddress: string = ''; // Add shippingAddress
+  quantity: number = 1;
+  shippingAddress: string = '';
+  userRole: string | null = null;
+  private roleSubscription!: Subscription;
 
   constructor(
     private productService: ProductService,
     private loadingService: LoadingService,
-    private cartService: CartService, // Inject CartService
-    private messageService: MessageService // Inject MessageService
+    private cartService: CartService,
+    private messageService: MessageService,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
     this.fetchProducts();
+    this.roleSubscription = this.authService.role$.subscribe(role => {
+      console.log(role);
+      this.userRole = role;
+    });    
     this.searchSubject.pipe(
       debounceTime(500),
       distinctUntilChanged()
     ).subscribe(searchTextValue => {
       this.fetchProducts({ name: searchTextValue });
     });
+  }
+
+  ngOnDestroy() {
+    if (this.roleSubscription) {
+      this.roleSubscription.unsubscribe();
+    }
   }
 
   fetchProducts(searchParams: { name?: string } = {}) {
@@ -98,10 +114,12 @@ export class HomePageComponent implements OnInit {
   refreshProducts() {
     this.searchValue = '';
     this.currentPage = 0;
-    this.fetchProducts(); 
+    this.fetchProducts();
   }
 
   showProductDetails(product: Product) {
+    console.log(product);
+    
     this.selectedProduct = product;
     this.displayDialog = true;
   }
@@ -114,8 +132,8 @@ export class HomePageComponent implements OnInit {
     }
     this.selectedProduct = product;
     this.quantity = 1;
-    this.shippingAddress = localStorage.getItem('address') || ''; // Reset shipping address
-    this.displayAddToCartDialog = true; // Show the add to cart dialog
+    this.shippingAddress = localStorage.getItem('address') || '';
+    this.displayAddToCartDialog = true;
   }
 
   confirmAddToCart() {
@@ -137,7 +155,7 @@ export class HomePageComponent implements OnInit {
           detail: 'Product has been added to the cart',
           life: 3000
         });
-        this.displayAddToCartDialog = false; // Close the dialog
+        this.displayAddToCartDialog = false;
       },
       error: (error) => {
         console.error('Error adding product to cart', error);

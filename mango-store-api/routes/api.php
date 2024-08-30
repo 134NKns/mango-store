@@ -10,6 +10,7 @@ use App\Http\Controllers\OrderDetailController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\PromotionTypeController;
 use App\Http\Controllers\PromotionController;
+use App\Http\Controllers\SystemPromptpayController;
 
 Route::get('/hello', function () {
     return response()->json('Hello World', 200);
@@ -67,7 +68,7 @@ Route::group([
     Route::resource('orderdetails', OrderDetailController::class);
     Route::get('orderdetails/search/order/{orderId}', [OrderDetailController::class, 'searchByOrderId']);
     Route::get('cart', [CartController::class, 'index']);
-    Route::post('cart/add', [CartController::class, 'addItem']);
+    Route::post('cart/add', [CartController::class, 'addItem'])->middleware(['role:customer']);
     Route::get('carts', [CartController::class, 'getAllCartsForAdmin'])->middleware(['role:admin']);
     Route::put('cart/update/{itemId}', [CartController::class, 'updateItem']);
     Route::delete('cart/remove/{itemId}', [CartController::class, 'removeItem']);
@@ -101,4 +102,14 @@ Route::group([
 
 Route::get('vendor/orders', [OrderController::class, 'getOrdersForVendor'])->middleware(['jwt.cookie', 'role:vendor']);
 
-
+// PromptPay Route
+Route::group([
+    'middleware' => ['api', 'jwt.cookie'],
+    'prefix' => 'system-promptpay'
+], function () {
+    Route::get('/', [SystemPromptpayController::class, 'index'])->middleware('role:admin');
+    Route::get('/show', [SystemPromptpayController::class, 'show']);
+    Route::post('/', [SystemPromptpayController::class, 'store'])->middleware('role:admin');
+    Route::put('/', [SystemPromptpayController::class, 'update'])->middleware('role:admin');
+    Route::delete('/', [SystemPromptpayController::class, 'destroy'])->middleware('role:admin');
+});

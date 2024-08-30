@@ -3,27 +3,41 @@
     <p-progressSpinner ariaLabel="loading"></p-progressSpinner>
   </div>
 
-  <div class="field p-2">
-    <p-floatLabel>
-      <input pInputText id="firstname" name="firstname" type="text" [(ngModel)]="userProfile.firstname" required />
-      <label for="firstname">ชื่อจริง</label>
-    </p-floatLabel>
-  </div>
+  <!-- ชื่อจริงและนามสกุลอยู่ในบรรทัดเดียวกัน -->
+  <div class="field p-2 grid">
+    <div class="col-12 md:col-6">
+      <p-floatLabel>
+        <input pInputText id="firstname" name="firstname" type="text" [(ngModel)]="userProfile.firstname" required />
+        <label for="firstname">ชื่อจริง</label>
+      </p-floatLabel>
+    </div>
   
-  <div class="field p-2">
-    <p-floatLabel>
-      <input pInputText id="lastname" name="lastname" type="text" [(ngModel)]="userProfile.lastname" required />
-      <label for="lastname">นามสกุล</label>
-    </p-floatLabel>
+    <div class="col-12 md:col-6 mt-5 md:mt-0">
+      <p-floatLabel>
+        <input pInputText id="lastname" name="lastname" type="text" [(ngModel)]="userProfile.lastname" required />
+        <label for="lastname">นามสกุล</label>
+      </p-floatLabel>
+    </div>
   </div>
+
+  <!-- อีเมลและเบอร์โทรอยู่ในบรรทัดเดียวกัน -->
+  <div class="field p-2 grid">
+    <div class="col-12 md:col-6">
+      <p-floatLabel>
+        <input pInputText id="email" name="email" type="email" [(ngModel)]="userProfile.email" required />
+        <label for="email">อีเมล</label>
+      </p-floatLabel>
+    </div>
   
-  <div class="field p-2">
-    <p-floatLabel>
-      <input pInputText id="email" name="email" type="email" [(ngModel)]="userProfile.email" required />
-      <label for="email">อีเมล</label>
-    </p-floatLabel>
+    <div class="col-12 md:col-6 mt-5 md:mt-0">
+      <p-floatLabel>
+        <input pInputText id="phone" name="phone" type="text" [(ngModel)]="userProfile.phone" required />
+        <label for="phone">เบอร์โทร</label>
+      </p-floatLabel>
+    </div>
   </div>
-  
+
+  <!-- ที่อยู่เป็นฟิลด์เดียวเต็มบรรทัด -->
   <div class="field p-2">
     <p-floatLabel>
       <input pInputText id="address" name="address" type="text" [(ngModel)]="userProfile.address" required />
@@ -31,45 +45,44 @@
     </p-floatLabel>
   </div>
   
-  <div class="field p-2">
-    <p-floatLabel>
-      <input pInputText id="phone" name="phone" type="text" [(ngModel)]="userProfile.phone" required />
-      <label for="phone">เบอร์โทร</label>
-    </p-floatLabel>
-  </div>
-  
+  <!-- ข้อมูลร้านค้า (เฉพาะ vendor) -->
   <div *ngIf="role === 'vendor'">
     <div class="field">
       <h3>ข้อมูลร้านค้า</h3>
     </div>
 
+    <!-- ชื่อร้านค้า -->
     <div class="field p-2">
       <p-floatLabel>
         <input pInputText id="store_name" name="store_name" type="text" [(ngModel)]="vendorDetail.store_name" required />
         <label for="store_name">ชื่อร้านค้า</label>
       </p-floatLabel>
     </div>
+
+    <!-- ธนาคารและหมายเลขพร้อมเพย์อยู่ในบรรทัดเดียวกัน -->
+    <div class="field p-2 grid">
+      <div class="col-12 md:col-6">
+        <p-dropdown 
+          [options]="banks" 
+          [(ngModel)]="selectedBank" 
+          optionLabel="label" 
+          autoWidth="false"
+          placeholder="ธนาคาร"
+          (ngModelChange)="onBankChange($event)"
+          [style]="{ width: '100%' }"
+          name="bank_name"
+        ></p-dropdown>
+      </div>
     
-    <div class="field p-2">
-      <p-dropdown 
-        [options]="banks" 
-        [(ngModel)]="selectedBank" 
-        optionLabel="label" 
-        autoWidth="false"
-        placeholder="ธนาคาร"
-        (ngModelChange)="onBankChange($event)"
-        [style]="{ width: '100%' }"
-        name="bank_name"
-      ></p-dropdown>
+      <div class="col-12 md:col-6 mt-5 md:mt-0">
+        <p-floatLabel>
+          <input pInputText id="promptpay_number" name="promptpay_number" type="text" [(ngModel)]="vendorDetail.promptpay_number" required />
+          <label for="promptpay_number">หมายเลขพร้อมเพย์</label>
+        </p-floatLabel>
+      </div>
     </div>
     
-    <div class="field p-2">
-      <p-floatLabel>
-        <input pInputText id="promptpay_number" name="promptpay_number" type="text" [(ngModel)]="vendorDetail.promptpay_number" required />
-        <label for="promptpay_number">หมายเลขพร้อมเพย์</label>
-      </p-floatLabel>
-    </div>
-    
+    <!-- ข้อมูล QR เพิ่มเติม -->
     <div class="field p-2">
       <p-floatLabel>
         <input pInputText id="additional_qr_info" name="additional_qr_info" type="text" [(ngModel)]="vendorDetail.additional_qr_info" required />
@@ -78,5 +91,8 @@
     </div>
   </div>
 
-  <button type="submit" pButton label="บันทึก" class="p-mt-5"></button>
+  <!-- ปุ่มบันทึก -->
+  <div class="field p-2">
+    <button type="submit" pButton label="บันทึก" class="p-mt-5 main-button"></button>
+  </div>
 </form>

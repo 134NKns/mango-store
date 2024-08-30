@@ -39,5 +39,7 @@ export const API_URLS = {
   get_all_orders: 'http://localhost:8000/api/orders', // GET to get all orders
   update_order_status: 'http://localhost:8000/api/orders', // PUT to update order status
   // New endpoint for vendor orders
-  get_vendor_orders: 'http://localhost:8000/api/vendor/orders'
+  get_vendor_orders: 'http://localhost:8000/api/vendor/orders',
+  // PromtPay endpoint
+  promptpay_info: 'http://localhost:8000/api/system-promptpay',
 };

@@ -36,12 +36,14 @@ export class LoginPageComponent {
     this.authService.login(this.credentials.username, this.credentials.password).subscribe(
       response => {
         this.loading = false;
-        console.log('Login successful', response);
       },
       error => {
         this.loading = false;
-        console.error('Login failed', error);
       }
     );
+  }
+
+  triggerSubmit(){
+   this.login();
   }
 }

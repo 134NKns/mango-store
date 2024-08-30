@@ -197,7 +197,7 @@ class OrderController extends Controller
 
         $orders = Order::whereHas('orderDetails.product', function($query) use ($user) {
             $query->where('vendor_id', $user->id);
-        })->with('orderDetails.product')->get();
+        })->with('orderDetails.product.images')->get();
 
         return response()->json($orders);
     }
@@ -502,9 +502,10 @@ class OrderController extends Controller
     
     public function getAllOrders()
     {
-        $orders = Order::with('orderDetails.product')->get();
+        $orders = Order::with('orderDetails.product.images', 'user.userProfile')->get();
         return response()->json($orders);
     }
+    
 
     public function updateOrderStatus(Request $request, $orderId)
     {
