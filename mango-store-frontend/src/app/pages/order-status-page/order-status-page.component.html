@@ -6,8 +6,9 @@
         <tr>
           <th>ลำดับ</th>
           <th>ชื่อสินค้า</th>
-          <th>รูปภาพสินค้า</th>
-           <!-- <th>ชื่อลูกค้า</th> -->
+          <!-- <th>รูปภาพสินค้า</th> -->
+           <th>ชื่อลูกค้า</th>
+          <th>รายละเอียดสินค้า</th>
           <th>ราคารวม</th>
           <th>สถานะการสั่งซื้อ</th>
           <th>หลักฐานการจ่ายเงิน</th>
@@ -17,12 +18,21 @@
       <ng-template pTemplate="body" let-order let-i="rowIndex">
         <tr>
           <td>{{ i + 1 }}</td>
-          <td>{{ order.order_details[0].product.name }}</td>
           <td>
+            @for(data of order.order_details ; track $index){
+              <span><br/>
+                {{data.product.name}}
+              </span>
+            }
+          </td>
+          <td>
+            {{ order.user.user_profile.firstname }} {{ order.user.user_profile.lastname }} 
+          </td>
+          <!-- <td>
             <img
               [src]="order.order_details[0]?.product?.images?.length > 0 ? order.order_details[0].product.images[0].image_data : '../../assets/images/no-image.png'"
               width="70" class="shadow-4" />
-          </td>
+          </td> -->
           <td>
             <button pButton class="main-button p-button-info w-full sm:w-auto" style="min-width: 150px;"
               label="รายละเอียดสินค้า" icon="pi pi-eye" *ngIf="order.order_details" (click)="viewOrderDetails(order)">
@@ -56,5 +66,9 @@
       <p-image class="payment-slip" *ngIf="selectedOrder.payment_slip"
         [src]="'data:image/png;base64,' + selectedOrder.payment_slip" alt="Payment Slip" width="350" />
     </ng-container>
+  </p-dialog>
+
+  <p-dialog header="รายละเอียดออเดอร์" [(visible)]="displayOrderDetailsModal" [modal]="true" [dismissableMask]="true" [style]="{ width: '90vw' }">
+    <app-order-details-modal [orders]="ordersDetail"></app-order-details-modal>
   </p-dialog>
 </div>

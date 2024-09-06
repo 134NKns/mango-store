@@ -12,6 +12,7 @@ import { DialogModule } from 'primeng/dialog';
 import { AuthService } from '../../services/auth.service';
 import { LoadingService } from '../../services/loading.service';
 import { CardModule } from 'primeng/card';
+import { OrderDetailsModalComponent } from './order-details-modal/order-details-modal.component';
 import { ImageModule } from 'primeng/image';
 
 @Component({
@@ -26,7 +27,8 @@ import { ImageModule } from 'primeng/image';
     DialogModule,
     CardModule,
     ConfirmDialogModule,
-    ImageModule
+    ImageModule,
+    OrderDetailsModalComponent
   ],
   templateUrl: './order-status-page.component.html',
   styleUrls: ['./order-status-page.component.scss'],
@@ -46,6 +48,7 @@ export class OrderStatusPageComponent implements OnInit {
   displaySlipDialog : boolean = false;
   displayOrderDetailsModal : boolean = false;
   userRole: string = ''; 
+  ordersDetail!: Order;
   constructor(
     private orderService: OrderService,
     private authService: AuthService,
@@ -106,6 +109,7 @@ export class OrderStatusPageComponent implements OnInit {
 
   updateStatus(order: Order): void {
     console.log('Updating order status', order); // Log order data
+    this.loadingService.show();
     this.orderService.updateOrderStatus(order.id, order.status).subscribe({
       next: () => {
         this.messageService.add({
@@ -113,6 +117,7 @@ export class OrderStatusPageComponent implements OnInit {
           summary: 'สำเร็จ',
           detail: 'อัปเดตสถานะคำสั่งซื้อเรียบร้อยแล้ว',
         });
+        this.loadingService.hide();
       },
       error: (error) => {
         this.messageService.add({
@@ -121,6 +126,7 @@ export class OrderStatusPageComponent implements OnInit {
           detail: 'ไม่สามารถอัปเดตสถานะคำสั่งซื้อได้',
         });
         console.error('Failed to update order status', error);
+        this
       },
     });
   }
@@ -166,7 +172,9 @@ export class OrderStatusPageComponent implements OnInit {
     });
   }
 
-  viewOrderDetails(order:any){
-
+  viewOrderDetails(order : Order){
+    console.log(order);
+    this.displayOrderDetailsModal = true;
+    this.ordersDetail = order;
   }
 }

@@ -202,19 +202,7 @@ export class MainNavbarComponent implements OnInit, OnDestroy,AfterViewInit {
         icon: 'pi pi-fw pi-home',
         routerLink : '/',
         isRouterLink : true,
-      },
-      {
-        label: 'ตะกร้าสินค้า',
-        icon: 'pi pi-fw pi-shopping-cart',
-        routerLink : 'cart',
-        isRouterLink : true,
-      },
-      {
-        label: 'คำสั่งซื้อของฉัน',
-        icon: 'pi pi-fw pi-list',
-        routerLink : '/order-customer',
-        isRouterLink : true,
-      },
+      }, 
       {
         label: 'รายการขาย',
         icon: 'pi pi-fw pi-dollar',

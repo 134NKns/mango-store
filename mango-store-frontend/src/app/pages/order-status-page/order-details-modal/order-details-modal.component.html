@@ -1,0 +1,28 @@
+<p-table *ngIf="orders && orders.order_details" [value]="orders.order_details" styleClass="p-datatable-gridlines">
+    <ng-template pTemplate="header">
+        <tr >
+            <th style="width:5%">ลำดับ</th>
+            <th style="width:30%">ชื่อสินค้า</th>
+            <th style="width:30%">ที่อยู่จัดส่ง</th>
+            <th style="width:5%">รูปภาพสินค้า</th>
+            <th style="width:5%">จำนวน</th>
+            <th style="width:10%">ราคา</th>
+        </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-orderDetail let-i="rowIndex">
+        <tr>
+            <td>{{ i + 1 }}</td> 
+            <td>{{ orderDetail.product.name }}</td>
+            <td>{{ orderDetail.shipping_address}}</td>
+            <td class="text-center"><p-image preview="true" [src]="orderDetail.product?.images?.length > 0 ? orderDetail.product.images[0].image_data : '../../../assets/images/no-image.png'" alt="รูปสินค้า" width="70" class="shadow-4"/></td>
+            <td>{{ orderDetail.quantity }}</td>
+            <td>{{ orderDetail.price }}</td>
+        </tr>
+    </ng-template> 
+    <ng-template pTemplate="footer">
+        <tr>
+            <td colspan="4">รวม</td>
+            <td colspan="2" [ngStyle]="{color: 'var(--green-700)'}">{{orders.total_price}}</td>
+        </tr>
+    </ng-template>
+</p-table>

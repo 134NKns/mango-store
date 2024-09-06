@@ -197,7 +197,7 @@ class OrderController extends Controller
 
         $orders = Order::whereHas('orderDetails.product', function($query) use ($user) {
             $query->where('vendor_id', $user->id);
-        })->with('orderDetails.product.images')->get();
+        })->with('orderDetails.product.images','user.userProfile')->get();
 
         return response()->json($orders);
     }

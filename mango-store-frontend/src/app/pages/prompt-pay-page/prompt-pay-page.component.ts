@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, Output, OnChanges, SimpleChanges, EventEmitter } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { PromptpayService, PromptpayInfo } from '../../services/promtpay.service';
 import { AuthService } from '../../services/auth.service';
@@ -32,6 +32,7 @@ interface Bank {
 })
 export class PromptPayPageComponent implements OnChanges {
   @Input() isVisiblePromptPaySettingModal: boolean = false;
+  @Output() isVisiblePromptPaySettingModalChange = new EventEmitter<boolean>();
   isUpdateMode: boolean = false;
   selectedBank: Bank | null = null;
   loading:boolean = false;
@@ -110,9 +111,13 @@ export class PromptPayPageComponent implements OnChanges {
         this.promptpayService.updatePromptpayInfo(this.promptpayData).subscribe(
             (data) => {
                 this.messageService.add({ severity: 'success', summary: 'Success', detail: 'PromptPay info updated successfully', life: 5000 });
+                this.isVisiblePromptPaySettingModal = false;
+                this.isVisiblePromptPaySettingModalChange.emit(this.isVisiblePromptPaySettingModal);
             },
             (error) => {
                 this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error updating PromptPay info', life: 5000 });
+                this.isVisiblePromptPaySettingModal = false;
+                this.isVisiblePromptPaySettingModalChange.emit(this.isVisiblePromptPaySettingModal);
             }
         );
     } else {
@@ -121,9 +126,13 @@ export class PromptPayPageComponent implements OnChanges {
                 this.messageService.add({ severity: 'success', summary: 'Success', detail: 'PromptPay info added successfully', life: 5000 });
                 this.isUpdateMode = true;
                 this.promptpayData = data;
+                this.isVisiblePromptPaySettingModal = false;
+                this.isVisiblePromptPaySettingModalChange.emit(this.isVisiblePromptPaySettingModal);
             },
             (error) => {
                 this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error adding PromptPay info', life: 5000 });
+                this.isVisiblePromptPaySettingModal = false;
+                this.isVisiblePromptPaySettingModalChange.emit(this.isVisiblePromptPaySettingModal);
             }
         );
     }
