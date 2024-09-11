@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CardModule } from 'primeng/card';
 import { SplitterModule } from 'primeng/splitter';
+import { ImageModule } from 'primeng/image';
 
 @Component({
   selector: 'app-qr-code',
@@ -13,7 +14,8 @@ import { SplitterModule } from 'primeng/splitter';
     CommonModule,
     FormsModule,
     CardModule,
-    SplitterModule
+    SplitterModule,
+    ImageModule
   ],
   templateUrl: './qr-code.component.html',
   styleUrls: ['./qr-code.component.scss']

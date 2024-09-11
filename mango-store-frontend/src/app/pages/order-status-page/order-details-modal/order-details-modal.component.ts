@@ -17,14 +17,4 @@ import { ImageModule } from 'primeng/image';
 })
 export class OrderDetailsModalComponent {
   @Input() orders! : Order;
-
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['orders']) {
-      console.log('xx');
-      if (this.orders) {
-        console.log(this.orders.order_details);
-        
-      }
-    }
-  }
 }

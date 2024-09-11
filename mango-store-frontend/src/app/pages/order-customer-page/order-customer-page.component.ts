@@ -86,6 +86,23 @@ export class OrderCustomerPageComponent implements OnInit {
     }
   }
 
+  translateOrderStatus(status: string): string {
+    switch (status) {
+      case 'pending':
+        return 'รอดำเนินการ';
+      case 'paid':
+        return 'ชำระเงินแล้ว';
+      case 'shipped':
+        return 'จัดส่งแล้ว';
+      case 'delivered':
+        return 'ส่งถึงแล้ว';
+      case 'cancelled':
+        return 'ยกเลิกแล้ว';
+      default:
+        return 'สถานะไม่ถูกต้อง';
+    }
+  }
+
   viewOrderDetails(order: Order): void {
     this.selectedOrder = order;
     this.displayDialog = true;

@@ -175,7 +175,7 @@ class OrderController extends Controller
         try {
             Log::info("Searching for orders with user_id: {$userId}");
     
-            $orders = Order::where('user_id', $userId)->with('orderDetails.product')->get();
+            $orders = Order::where('user_id', $userId)->with('orderDetails.product.images','user.userProfile')->get();
     
             Log::info("Found " . count($orders) . " orders for user_id: {$userId}");
     

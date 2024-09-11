@@ -1,73 +1,90 @@
-<div class="p-grid p-dir-col p-ai-center p-jc-center full-height">
-  <div class="p-col-12 p-md-10">
-    <p-steps [model]="steps" [(activeIndex)]="activeIndex" [readonly]="false"></p-steps>
-    <div [ngSwitch]="activeIndex" class="p-mt-3">
-      <!-- Order Summary Step -->
-      <div *ngSwitchCase="0" class="p-grid p-dir-col p-ai-center p-jc-center">
-        <h2>Order Summary</h2>
-        <table class="table">
-          <thead>
-            <tr>
-              <th>ชื่อสินค้า</th>
-              <th>จำนวน</th>
-              <th>ราคา</th>
-              <th>ส่วนลด</th>
-              <th>รวม</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let detail of order.order_details">
-              <td>{{ detail.product.name }}</td>
-              <td>{{ detail.quantity }}</td>
-              <td>{{ detail.price | currency:'THB':'symbol':'1.2-2' }}</td>
-              <td>{{ formatDiscount(detail) }}</td>
-              <td>{{ formatTotal(detail) }}</td>
-            </tr>
-          </tbody>
-        </table>
-        <div class="p-d-flex p-jc-end p-mt-3" style="width: 100%;">
-          <h3>รวมทั้งหมด: {{ totalAmount | currency:'THB':'symbol':'1.2-2' }}</h3>
+<p-card>
+  <div class="card-body">
+    <p-steps [model]="steps" [(activeIndex)]="activeIndex" [readonly]="true"></p-steps>
+    <div class="sandbox flex align-content-center flex-wrap justify-content-center">
+      <p-card class="shadow-4">
+        <div [ngSwitch]="activeIndex" class="p-3 m-3">
+          <!-- Order Summary Step -->
+          <div *ngSwitchCase="0">
+            <p-table [value]="order.order_details" styleClass="p-datatable-gridlines">
+              <ng-template pTemplate="header">
+                <tr>
+                  <th>ชื่อสินค้า</th>
+                  <th>จำนวน</th>
+                  <th>ราคา</th>
+                  <th>ส่วนลด</th>
+                  <th>รวม</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-orderDetail>
+                <tr>
+                  <td>{{ orderDetail.product.name }}</td>
+                  <td>{{ orderDetail.quantity }}</td>
+                  <td>{{ orderDetail.price | currency:'THB':'symbol':'1.2-2' }}</td>
+                  <td>{{ formatDiscount(orderDetail) }}</td>
+                  <td>{{ formatTotal(orderDetail) }}</td>
+                </tr>
+              </ng-template>
+  
+              <ng-template pTemplate="footer" let-orderDetail>
+                <tr>
+                  <td colspan="3">รวมทั้งหมด:</td>
+                  <td colspan="2">{{ totalAmount | currency:'THB':'symbol':'1.2-2' }}</td>
+                </tr>
+              </ng-template>
+            </p-table>
+  
+            <div class="mt-3 flex flex-row-reverse flex-wrap" style="width: 100%;">
+              <button pButton label="ยกเลิก" icon="pi pi-times" class="p-button-danger" (click)="confirmCancel()" style="margin: 1rem;" [style]="{ width: '7rem' }" ></button>
+              <button pButton label="ถัดไป" icon="pi pi-chevron-right" (click)="goToStep(1)" class="main-button" style="margin: 1rem;" [style]="{ width: '7rem' }" ></button>
+            </div>
+          </div>
+          <!-- Payment Step -->
+          <div *ngSwitchCase="1" class="flex flex-row flex-wrap w-full" >
+            <div class="w-full flex justify-content-center flex-wrap">
+              <div class='qrCard'>
+                <p-card>
+                  <div class="text-lg">
+                    <p><strong>ชื่อบัญชี :</strong> {{ centralPayment.store_name }}</p>
+                    <p><strong>หมายเลขบัญชี : </strong> {{centralPayment.phoneNumber}}</p>
+                    <p><strong>จำนวนเงิน : </strong> {{ totalAmount }} บาท</p>
+                  </div>
+                  <div class="qrCodeImage w-full flex justify-content-center flex-wrap">
+                    <app-qr-code [phoneNumber]="centralPayment.phoneNumber" [amount]="centralPayment.amount" [userName]="centralPayment.userName"
+                                 class="flex align-items-center justify-content-center">
+                    </app-qr-code>
+                  </div>
+                  <p-fileUpload 
+                    mode="basic" 
+                    name="slip" 
+                    accept="image/*" 
+                    customUpload="true"
+                    chooseLabel="อัพโหลดสลิป" 
+                    (onSelect)="onFileSelect($event)">
+                  </p-fileUpload>
+                </p-card>
+              </div>
+            </div>
+            <div class="mt-3 flex flex-row-reverse flex-wrap" style="width: 100%;">
+              <button pButton label="ยกเลิก" icon="pi pi-times" class="p-button-danger"
+              (click)="confirmCancel()" [style]="{ width: '8rem' }" style="margin: 1rem;"></button>
+              <button pButton label="ย้อนกลับ" icon="pi pi-chevron-left" (click)="goToStep(0)" [style]="{ width: '8rem' }" style="margin: 1rem;" severity="secondary"></button>
+              <button pButton label="ถัดไป" class="main-button" icon="pi pi-chevron-right" (click)="onNext()"
+                [disabled]="!selectedFile && !slipUploaded" [style]="{ width: '8rem' }" style="margin: 1rem;"></button>
+            </div>
+          </div>
+          <!-- Thank You Step -->
+          <div *ngSwitchCase="2" class="flex justify-content-center flex-wrap text-center">
+            <div class="w-full"><h2>ขอบคุณสำหรับการชำระเงิน</h2></div>
+            <div class="w-full"><h3 style="color: gray;">ระบบจะเข้าสู่หน้าแรกภายใน 3 วินาที</h3></div>
+          </div>
         </div>
-        <div class="p-d-flex p-jc-between p-mt-3" style="width: 100%;">
-          <button pButton label="Next" icon="pi pi-chevron-right" (click)="goToStep(1)"></button>
-          <button pButton label="Cancel" icon="pi pi-times" class="p-button-danger" (click)="confirmCancel()"></button>
-        </div>
-      </div>
-      <!-- Payment Step -->
-      <div *ngSwitchCase="1" class="p-grid p-dir-col p-ai-center p-jc-center">
-        <h2>Payment</h2>
-        <div>
-          <p>Central Account: {{ centralPayment.store_name }}</p>
-          <p>{{centralPayment.phoneNumber}}</p>
-          <app-qr-code 
-            [phoneNumber]="centralPayment.phoneNumber" 
-            [amount]="centralPayment.amount" 
-            [userName]="centralPayment.userName">
-          </app-qr-code>
-          <p-fileUpload 
-            mode="basic" 
-            name="slip" 
-            accept="image/*" 
-            customUpload="true" 
-            (onSelect)="onFileSelect($event)">
-          </p-fileUpload>
-        </div>
-        <div class="p-d-flex p-jc-between p-mt-3" style="width: 100%;">
-          <button pButton label="Previous" icon="pi pi-chevron-left" (click)="goToStep(0)"></button>
-          <button pButton label="Next" icon="pi pi-chevron-right" (click)="onNext()" [disabled]="!selectedFile && !slipUploaded"></button>
-          <button pButton label="Cancel" icon="pi pi-times" class="p-button-danger" (click)="confirmCancel()"></button>
-        </div>
-      </div>
-      <!-- Thank You Step -->
-      <div *ngSwitchCase="2" class="p-grid p-dir-col p-ai-center p-jc-center">
-        <h2>Thank You</h2>
-        <p>Thank you for your payment!</p>
-        <div class="p-d-flex p-jc-between p-mt-3" style="width: 100%;">
-          <button pButton label="Finish" icon="pi pi-check" (click)="finish()"></button>
-          <button pButton label="Cancel" icon="pi pi-times" class="p-button-danger" (click)="confirmCancel()"></button>
-        </div>
-      </div>
+      </p-card>
     </div>
   </div>
-  <p-confirmDialog header="Confirmation" icon="pi pi-exclamation-triangle" acceptLabel="Yes" rejectLabel="No" (accept)="cancel()" message="คุณแน่ใจว่าต้องการยกเลิกการทำรายการนี้หรือไม่?"></p-confirmDialog>
-</div>
+  <p-confirmDialog header="Confirmation" icon="pi pi-exclamation-triangle" acceptLabel="Yes" rejectLabel="No"
+    (accept)="cancel()" message="คุณแน่ใจว่าต้องการยกเลิกการทำรายการนี้หรือไม่?"></p-confirmDialog>
+
+</p-card>
+
+

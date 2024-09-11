@@ -1,6 +1,6 @@
-<div class="pt-3 w-full h-full flex flex-column">
+<div class="pt-3">
   <div class="p-col-12 p-md-10">
-    <p-table [value]="carts" [tableStyle]="{ 'min-width': '50rem' , 'min-height' : '100vh'}" responsiveLayout="scroll" emptyMessage="ไม่มีข้อมูลสินค้า">
+    <p-table [value]="carts" responsiveLayout="scroll" emptyMessage="ไม่มีข้อมูลสินค้า">
       <ng-template pTemplate="header">
         <tr>
           <th>ชื่อสินค้า</th>
@@ -11,7 +11,7 @@
         <th></th>
         </tr>
       </ng-template>
-      <ng-template pTemplate="body" let-cart>
+      <ng-template pTemplate="body" let-cart >
         <ng-container *ngIf="cart.items && cart.items.length; else noItems">
           <ng-container *ngFor="let item of cart.items">
             <tr>

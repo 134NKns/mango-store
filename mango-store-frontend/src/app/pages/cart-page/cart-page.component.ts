@@ -127,9 +127,11 @@ export class CartPageComponent implements OnInit {
   }
 
   checkout() {
+    this.loadingService.show();
     this.cartService.checkoutCart().subscribe({
       next: (response) => {
         console.log('Checkout successful', response);
+        this.loadingService.hide();
         this.messageService.add({
           severity: 'success',
           summary: 'Checkout Successful',
@@ -137,13 +139,16 @@ export class CartPageComponent implements OnInit {
           life: 5000
         });
         if (response.orders && response.orders.length > 0) {
+          this.loadingService.hide();
           this.router.navigate(['/checkout'], { state: { orders: response.orders } });
         } else {
+          this.loadingService.hide();
           console.error('No orders found in the response');
         }
       },
       error: (error) => {
         console.error('Error during checkout', error);
+        this.loadingService.hide();
         this.messageService.add({
           severity: 'error',
           summary: 'Checkout Failed',

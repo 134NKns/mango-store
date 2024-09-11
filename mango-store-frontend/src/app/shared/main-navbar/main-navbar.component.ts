@@ -185,13 +185,7 @@ export class MainNavbarComponent implements OnInit, OnDestroy,AfterViewInit {
         icon: 'pi pi-fw pi-user-edit',
         command: () => this.openEditModal(),
         isRouterLink : false,
-      },
-      {
-        label: 'สถานะการสั่งซื้อ',
-        icon: 'pi pi-fw pi-clock',
-        routerLink : 'order-status',
-        isRouterLink : true,
-      },
+      }
     ];
   }
   

@@ -99,6 +99,8 @@ export class OrderStatusPageComponent implements OnInit {
       this.orderService.getOrdersByUserId(Number(userId)).subscribe({
         next: (orders) => {
           this.orders = orders;
+          console.log(orders);
+          
           this.loadingService.hide();
         },
         error: handleError,
@@ -177,4 +179,22 @@ export class OrderStatusPageComponent implements OnInit {
     this.displayOrderDetailsModal = true;
     this.ordersDetail = order;
   }
+
+  translateOrderStatus(status: string): string {
+    switch (status) {
+      case 'pending':
+        return 'รอดำเนินการ';
+      case 'paid':
+        return 'ชำระเงินแล้ว';
+      case 'shipped':
+        return 'จัดส่งแล้ว';
+      case 'delivered':
+        return 'ส่งถึงแล้ว';
+      case 'cancelled':
+        return 'ยกเลิกแล้ว';
+      default:
+        return 'สถานะไม่ถูกต้อง';
+    }
+  }
+  
 }

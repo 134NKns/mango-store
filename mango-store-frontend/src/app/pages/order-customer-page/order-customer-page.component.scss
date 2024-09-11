@@ -6,3 +6,7 @@
   :host ::ng-deep .p-datatable-wrapper {
     min-height: 100vh;
   }
+
+  :host ::ng-deep .p-tag{
+    min-width: 5rem;
+  }

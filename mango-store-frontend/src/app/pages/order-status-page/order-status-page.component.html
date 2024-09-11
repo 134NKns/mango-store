@@ -6,13 +6,12 @@
         <tr>
           <th>ลำดับ</th>
           <th>ชื่อสินค้า</th>
-          <!-- <th>รูปภาพสินค้า</th> -->
-           <th>ชื่อลูกค้า</th>
+          <th>ชื่อลูกค้า</th>
           <th>รายละเอียดสินค้า</th>
           <th>ราคารวม</th>
           <th>สถานะการสั่งซื้อ</th>
           <th>หลักฐานการจ่ายเงิน</th>
-          <th>จัดการ</th>
+          <th *ngIf="userRole !== 'customer'">จัดการ</th>
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-order let-i="rowIndex">
@@ -28,11 +27,6 @@
           <td>
             {{ order.user.user_profile.firstname }} {{ order.user.user_profile.lastname }} 
           </td>
-          <!-- <td>
-            <img
-              [src]="order.order_details[0]?.product?.images?.length > 0 ? order.order_details[0].product.images[0].image_data : '../../assets/images/no-image.png'"
-              width="70" class="shadow-4" />
-          </td> -->
           <td>
             <button pButton class="main-button p-button-info w-full sm:w-auto" style="min-width: 150px;"
               label="รายละเอียดสินค้า" icon="pi pi-eye" *ngIf="order.order_details" (click)="viewOrderDetails(order)">
@@ -43,7 +37,7 @@
             <p-dropdown [options]="statuses" styleClass="w-full" [(ngModel)]="order.status"
               (onChange)="updateStatus(order)" *ngIf="userRole !== 'customer'">
             </p-dropdown>
-            <span *ngIf="userRole === 'customer'">{{ order.status }}</span>
+            <span *ngIf="userRole === 'customer'">{{ translateOrderStatus(order.status) }}</span>
           </td>
           <td>
             <button pButton class="main-button p-button-success w-full sm:w-auto" style="min-width: 150px;"
@@ -51,7 +45,7 @@
             </button>
             <span *ngIf="!order.payment_slip">ยังไม่อัพโหลดหลักฐาน</span>
           </td>
-          <td>
+          <td *ngIf="userRole !== 'customer'">
             <button pButton label="ยกเลิกออเดอร์" icon="pi pi-times" class="p-button-danger w-full sm:w-auto"
               style="min-width: 150px;" [disabled]="order.status === 'cancelled'" (click)="confirmCancel(order)"
               *ngIf="userRole !== 'customer'">

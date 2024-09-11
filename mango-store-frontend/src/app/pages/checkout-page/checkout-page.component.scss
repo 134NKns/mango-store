@@ -1,0 +1,27 @@
+.card-body{
+    margin: 1rem;
+    padding: 1rem;
+    min-height: 80vh;
+    width: 100%;
+}
+
+.sandbox{
+  min-height: 80vh;
+}
+
+:host ::ng-deep .p-steps ul{
+  padding: 1rem;
+}
+
+:host ::ng-deep .p-fileupload-choose{
+    width: 100%;
+}
+
+.qrCard {
+    width: 100%; // สำหรับ mobile หน้าจอแคบกว่า 768px จะเป็น 100%
+  
+    @media (min-width: 1024px) {
+      // สำหรับหน้าจอ Desktop
+      width: 50%;
+    }
+  }
