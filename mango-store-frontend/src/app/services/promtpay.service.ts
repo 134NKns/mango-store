@@ -8,6 +8,7 @@ import { MessageService } from 'primeng/api';
 
 export interface PromptpayInfo {
   id?: number;
+  account_name: string;
   bank_name: string;
   promptpay_number: string;
   additional_qr_info?: string;

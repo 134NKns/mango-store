@@ -54,6 +54,8 @@ export class OrderCustomerPageComponent implements OnInit {
           this.paginatedOrders = this.orders.slice(0, this.rows);
           this.cdr.markForCheck();
           this.loadingService.hide();
+          console.log(orders);
+          
         },
         error: (error) => {
           console.error('Error fetching orders for user', error);

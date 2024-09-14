@@ -29,19 +29,26 @@ class SystemPromptpayController extends Controller
     public function store(Request $request)
     {
         Log::info('Incoming request data:', $request->all());
+        
+        // Validate the input, including the new 'account_name' field
         $request->validate([
+            'account_name' => 'required|string|max:255',
             'bank_name' => 'required|string|max:255',
             'promptpay_number' => 'required|string|max:255',
             'additional_qr_info' => 'nullable|string',
         ]);
-        Log::info('Required Pass');
+        
+        Log::info('Validation passed');
     
+        // Check if a record already exists
         $existingPromptpay = SystemPromptpay::first();
         if ($existingPromptpay) {
             return response()->json(['message' => 'PromptPay record already exists'], 400);
         }
     
+        // Create a new SystemPromptpay record with all request data
         $promptpay = SystemPromptpay::create($request->all());
+        
         return response()->json($promptpay, 201);
     }
     
@@ -71,22 +78,30 @@ class SystemPromptpayController extends Controller
     public function update(Request $request)
     {
         Log::info('SystemPromptpayController@update called', ['request' => $request->all()]);
-
+    
+        // Validate the input, including the 'account_name' field
         $request->validate([
+            'account_name' => 'required|string|max:255',
             'bank_name' => 'required|string|max:255',
             'promptpay_number' => 'required|string|max:255',
             'additional_qr_info' => 'nullable|string',
         ]);
-
+    
+        // Fetch the first SystemPromptpay record
         $promptpay = SystemPromptpay::first();
         if (!$promptpay) {
             Log::warning('PromptPay record not found for update');
             return response()->json(['message' => 'PromptPay not found'], 404);
         }
+    
+        // Update the existing SystemPromptpay record
         $promptpay->update($request->all());
+        
         Log::info('PromptPay record updated', ['promptpay' => $promptpay]);
+        
         return response()->json($promptpay);
     }
+    
 
     /**
      * Remove the specified resource from storage.

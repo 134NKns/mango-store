@@ -12,6 +12,7 @@ class SystemPromptpay extends Model
     protected $table = 'system_promptpay';
 
     protected $fillable = [
+        'account_name',
         'bank_name',
         'promptpay_number',
         'additional_qr_info',

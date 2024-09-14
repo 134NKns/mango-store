@@ -16,7 +16,7 @@ import { forkJoin } from 'rxjs';
 import { OrderService } from '../../services/order.service';
 import { LoadingService } from '../../services/loading.service';
 import { CardModule } from 'primeng/card';
-
+import { PromptpayService } from '../../services/promtpay.service';
 
 interface QrPayment {
   store_name: string;
@@ -58,12 +58,12 @@ export class CheckoutPageComponent implements OnInit {
   slipUploaded: boolean = false;
   totalAmount: number = 0;
   centralPayment: QrPayment = {
-    store_name: 'Central Account',
-    phoneNumber: '0623524572',
+    store_name: '',
+    phoneNumber: '',
     amount: 0,
-    userName: 'Central User',
-    vendor_id: 'central'
-  };
+    userName: '',
+    vendor_id: ''
+  }; 
   steps: any[] = [
     { label: 'สรุปรายการ' },
     { label: 'ธุรกรรม' },
@@ -75,11 +75,13 @@ export class CheckoutPageComponent implements OnInit {
     private loadingService: LoadingService,
     private orderService: OrderService,
     private confirmationService: ConfirmationService,
-    private router: Router
+    private router: Router,
+    private promptpayService : PromptpayService,
   ) { }
 
   ngOnInit(): void {
     this.loadingService.show();
+    this.getPromptpayInfo();
     const state = history.state as { orders: Order[] };
 
     if (state && state.orders && state.orders.length > 0) {
@@ -95,6 +97,20 @@ export class CheckoutPageComponent implements OnInit {
     }
   }
 
+  getPromptpayInfo(): void {
+    this.promptpayService.getPromptpayInfo().subscribe(
+      (data) => {
+        if (data) {
+          this.centralPayment.store_name = data.account_name;
+          this.centralPayment.phoneNumber = data.promptpay_number;
+        }
+      },
+      (error) => {
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error fetching PromptPay info', life: 5000 });
+      }
+    );  
+  }
+
   calculateTotalAmount(): void {
     this.totalAmount = this.orders.reduce((sum, order) => {
       return sum + order.order_details.reduce((orderSum, detail) => {
@@ -107,7 +123,7 @@ export class CheckoutPageComponent implements OnInit {
     }, 0);
 
     console.log(`Calculated Total Amount: ${this.totalAmount}`);
-    this.centralPayment.amount = this.totalAmount; // Set the amount for QR Payment
+    this.centralPayment.amount = this.totalAmount; 
   }
 
   calculateDiscount(detail: OrderDetail): number {

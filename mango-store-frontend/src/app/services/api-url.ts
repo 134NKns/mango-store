@@ -43,3 +43,4 @@ export const API_URLS = {
   // PromtPay endpoint
   promptpay_info: 'http://localhost:8000/api/system-promptpay',
 };
+    

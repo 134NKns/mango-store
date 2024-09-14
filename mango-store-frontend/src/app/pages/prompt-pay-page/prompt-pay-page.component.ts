@@ -36,11 +36,15 @@ export class PromptPayPageComponent implements OnChanges {
   isUpdateMode: boolean = false;
   selectedBank: Bank | null = null;
   loading:boolean = false;
+
+  // Added 'account_name' field in PromptpayData
   promptpayData: PromptpayInfo = {
+    account_name: '',  // New field for account name
     bank_name: '',
     promptpay_number: '',
     additional_qr_info: ''
   };
+
   banks: Bank[] = [
     { label: 'ธนาคารกรุงเทพ', value: 'BBL' },
     { label: 'ธนาคารกรุงไทย', value: 'KTB' },
@@ -68,7 +72,7 @@ export class PromptPayPageComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['isVisiblePromptPaySettingModal'] && this.isVisiblePromptPaySettingModal) {
-      this.checkPromptpayRecord(); // เรียกเมธอดนี้เมื่อ Modal ถูกเปิด
+      this.checkPromptpayRecord(); // Load data when modal is opened
     }
   }
 
@@ -80,7 +84,7 @@ export class PromptPayPageComponent implements OnChanges {
           this.isUpdateMode = true;
           this.promptpayData = data;
   
-          // ค้นหา bank ที่ตรงกับค่า bank_name ใน promptpayData และตั้งค่า selectedBank
+          // Set selectedBank if it matches with promptpayData.bank_name
           const matchingBank = this.banks.find(bank => bank.value === this.promptpayData.bank_name);
           if (matchingBank) {
             this.selectedBank = matchingBank;
@@ -97,14 +101,13 @@ export class PromptPayPageComponent implements OnChanges {
       }
     );
   }
-  
 
   onSubmit(promptpayForm: NgForm): void {
     if (promptpayForm.invalid) {
         return;
     }
   
-    // ตรวจสอบว่า selectedBank มีค่า และตั้งค่า bank_name ใน promptpayData
+    // Set bank_name in promptpayData from selectedBank
     this.promptpayData.bank_name = this.selectedBank ? this.selectedBank.value : '';
   
     if (this.isUpdateMode) {
@@ -137,7 +140,4 @@ export class PromptPayPageComponent implements OnChanges {
         );
     }
   }
-  
-  
-
 }

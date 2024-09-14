@@ -3,15 +3,30 @@
 </div>
 <form #promptpayForm="ngForm" (ngSubmit)="onSubmit(promptpayForm)">
   <div class="card mt-1">
-    <h4 >{{ isUpdateMode ? 'อัพเดทข้อมูล Promtpay' : '' }}</h4>
+    <h4>{{ isUpdateMode ? 'อัพเดทข้อมูล Promtpay' : '' }}</h4>
 
+    <!-- Account Name Field -->
+    <div class="inputField w-full p-3">
+      <p-floatLabel>
+        <input pInputText id="account_name" name="account_name" [(ngModel)]="promptpayData.account_name" required
+          [style]="{ width: '100%' }" />
+        <label for="account_name">ชื่อบัญชี</label>
+      </p-floatLabel>
+      <div
+        *ngIf="promptpayForm.controls['account_name']?.touched && promptpayForm.controls['account_name']?.errors"
+        class="error-message mt-1">
+        <small *ngIf="promptpayForm.controls['account_name']?.errors?.['required']" class="text-red-500">
+          โปรดระบุชื่อบัญชี
+        </small>
+      </div>
+    </div>
+
+    <!-- Bank Name Field -->
     <div class="inputField w-full p-3">
       <p-floatLabel>
         <p-dropdown id="bank_name" name="bank_name" [options]="banks" [(ngModel)]="selectedBank" optionLabel="label"
           placeholder="Select a Bank" required [style]="{ width: '100%' }">
         </p-dropdown>
-
-
         <label for="bank_name">ธนาคาร</label>
       </p-floatLabel>
       <div *ngIf="promptpayForm.controls['bank_name']?.touched && promptpayForm.controls['bank_name']?.errors"
@@ -22,6 +37,7 @@
       </div>
     </div>
 
+    <!-- PromptPay Number Field -->
     <div class="inputField w-full p-3">
       <p-floatLabel>
         <input pInputText id="promptpay_number" name="promptpay_number" [(ngModel)]="promptpayData.promptpay_number"
@@ -37,18 +53,10 @@
       </div>
     </div>
 
-    <!-- <div class="inputField w-full p-3">
-      <p-floatLabel>
-        <textarea pInputTextarea id="additional_qr_info" name="additional_qr_info"
-          [(ngModel)]="promptpayData.additional_qr_info" [style]="{ width: '100%' }">
-        </textarea>
-        <label for="additional_qr_info">หมายเลขพร้อมเพย์อื่นๆ</label>
-      </p-floatLabel>
-    </div> -->
-
+    <!-- Submit Button -->
     <div class="p-3">
-      <button pButton type="submit" label="{{ isUpdateMode ? 'อัพเดทข้อมูล' : 'เพิ่มข้อมูล' }}" class="main-button" [style]="{ width: '100%' }"
-        [disabled]="!promptpayForm.valid"></button>
+      <button pButton type="submit" label="{{ isUpdateMode ? 'อัพเดทข้อมูล' : 'เพิ่มข้อมูล' }}" class="main-button"
+        [style]="{ width: '100%' }" [disabled]="!promptpayForm.valid"></button>
     </div>
   </div>
 </form>

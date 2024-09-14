@@ -21,7 +21,7 @@ import { ImageModule } from 'primeng/image';
   styleUrls: ['./qr-code.component.scss']
 })
 export class QrCodeComponent implements OnChanges {
-  @Input() phoneNumber: string = '0623524572'; // Default value
+  @Input() phoneNumber: string = '';
   @Input() amount: number = 0;
   @Input() userName: string = '';
 
