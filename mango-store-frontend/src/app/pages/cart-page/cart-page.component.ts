@@ -100,9 +100,6 @@ export class CartPageComponent implements OnInit {
           return basePrice * item.quantity * (discountValue / 100);
         case 'ส่วนลดคงที่':
           return discountValue * item.quantity;
-        case 'ส่วนลดซื้อหนึ่งแถมหนึ่ง':
-          const freeItems = Math.floor(item.quantity / 2);
-          return basePrice * freeItems;
       }
     }
     return 0;
@@ -166,8 +163,6 @@ export class CartPageComponent implements OnInit {
         return `ส่วนลด ${promotion.discount_value}%`;
       case 'ส่วนลดคงที่':
         return `ลดราคา ${promotion.discount_value} บาท`;
-      case 'ส่วนลดซื้อหนึ่งแถมหนึ่ง':
-        return `ซื้อ 1 แถม 1`;
       default:
         return `โปรโมชั่น`;
     }
