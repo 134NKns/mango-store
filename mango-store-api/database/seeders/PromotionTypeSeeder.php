@@ -23,18 +23,6 @@ class PromotionTypeSeeder extends Seeder
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ],
-            [
-                'name' => 'ซื้อหนึ่งแถมหนึ่ง',
-                'description' => 'โปรโมชั่นซื้อหนึ่งแถมหนึ่งสำหรับสินค้าที่ซื้อ',
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ],
-            [
-                'name' => 'จัดส่งฟรี',
-                'description' => 'โปรโมชั่นจัดส่งฟรี',
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ]
         ];
 
         DB::table('promotion_types')->insert($promotionTypes);

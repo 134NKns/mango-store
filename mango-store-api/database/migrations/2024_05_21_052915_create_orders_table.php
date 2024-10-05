@@ -16,9 +16,9 @@ return new class extends Migration
             $table->foreignId('user_id')->nullable()->constrained('users');
             $table->decimal('total_price', 10, 2)->nullable();
             $table->enum('status', ['pending', 'paid', 'shipped', 'delivered', 'cancelled'])->nullable();
+            $table->longText('payment_slip')->nullable();
             $table->timestamps();
-        });
-        
+        });   
     }
 
     /**

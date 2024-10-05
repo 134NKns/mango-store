@@ -13,6 +13,7 @@ return new class extends Migration
             $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
             $table->unsignedInteger('quantity');
             $table->decimal('price', 10, 2);
+            $table->decimal('discount', 8, 2)->default(0);
             $table->text('shipping_address')->nullable();
             $table->timestamps(); // Add this line to include created_at and updated_at columns
         });

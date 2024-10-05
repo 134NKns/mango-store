@@ -115,28 +115,43 @@ class OrderController extends Controller
         }
     }
 
-    public function cancelOrder(Order $order)
+    public function cancelOrder($orderId)
     {
         DB::beginTransaction();
-
+    
         try {
-            $order->status = 'cancelled';
-            $order->save();
-
-            foreach ($order->orderDetails as $detail) {
-                $product = $detail->product;
-                $product->stock += $detail->quantity;
-                $product->save();
+            Log::info('Order cancellation process started', ['order_id' => $orderId]);
+    
+            $order = Order::findOrFail($orderId);
+    
+            if ($order->status === 'paid' || $order->status === 'shipping') {
+                foreach ($order->orderDetails as $orderDetail) {
+                    // คืนสต็อกตามจำนวนที่หักไปก่อนหน้านี้
+                    $product = $orderDetail->product;
+                    $product->stock += $orderDetail->quantity;
+                    // $product->save();
+                    Log::info('Stock returned for product', ['product_id' => $product->id, 'new_stock' => $product->stock]);
+                }
+    
+                $order->status = 'cancelled';
+                $order->save();
+                Log::info('Order status updated to cancelled', ['order_id' => $orderId]);
+    
+                DB::commit();
+                Log::info('Order cancellation committed successfully');
+    
+                return response()->json(['message' => 'Order cancelled and stock returned successfully'], 200);
+            } else {
+                Log::warning('Order is not eligible for cancellation', ['order_id' => $orderId, 'status' => $order->status]);
+                return response()->json(['error' => 'Order is not eligible for cancellation'], 400);
             }
-
-            DB::commit();
-
-            return response()->json(['message' => 'Order cancelled successfully'], 200);
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('Error cancelling order', ['error' => $e->getMessage()]);
             return response()->json(['error' => 'Failed to cancel order', 'message' => $e->getMessage()], 500);
         }
     }
+    
 
     public function getQrPayments($order_id)
     {
@@ -228,52 +243,24 @@ class OrderController extends Controller
             }
     
             $orders = [];
+            $vendorOrders = [];
     
-            if ($paymentStatus === 'paid') {
-                $vendorOrders = [];
-                foreach ($cart->items as $item) {
-                    $vendorId = $item->product->vendor_id;
-                    if (!isset($vendorOrders[$vendorId])) {
-                        $vendorOrders[$vendorId] = [];
-                    }
-                    $vendorOrders[$vendorId][] = $item;
+            foreach ($cart->items as $item) {
+                $vendorId = $item->product->vendor_id;
+                if (!isset($vendorOrders[$vendorId])) {
+                    $vendorOrders[$vendorId] = [];
                 }
+                $vendorOrders[$vendorId][] = $item;
+            }
     
-                Log::info('Vendor orders grouped', ['vendorOrders' => $vendorOrders]);
+            Log::info('Vendor orders grouped', ['vendorOrders' => $vendorOrders]);
     
-                foreach ($vendorOrders as $vendorId => $items) {
-                    $vendorCart = new Cart();
-                    $vendorCart->items = collect($items);
+            foreach ($vendorOrders as $vendorId => $items) {
+                $vendorCart = new Cart();
+                $vendorCart->items = collect($items);
     
-                    $totalPrice = $this->calculateTotalPrice($vendorCart);
-                    Log::info('Calculated total price for vendor ' . $vendorId, ['totalPrice' => $totalPrice]);
-    
-                    $order = Order::create([
-                        'user_id' => $request->user()->id,
-                        'total_price' => $totalPrice,
-                        'status' => $paymentStatus,
-                        'payment_slip' => $filePath
-                    ]);
-    
-                    foreach ($items as $item) {
-                        $orderDetail = $order->orderDetails()->create([
-                            'product_id' => $item->product_id,
-                            'quantity' => $item->quantity,
-                            'price' => $item->product->price,
-                            'discount' => $item->discount,
-                            'shipping_address' => $item->shipping_address
-                        ]);
-                        $this->applyPromotionToOrderDetail($orderDetail);
-                        Log::info('Order detail created for item', ['order_detail' => $orderDetail]);
-                    }
-    
-                    $order->save();
-                    Log::info('Order saved for vendor', ['order_id' => $order->id, 'vendor_id' => $vendorId]);
-                    $orders[] = $order;
-                }
-            } else {
-                $totalPrice = $this->calculateTotalPrice($cart);
-                Log::info('Calculated total price for cart', ['totalPrice' => $totalPrice]);
+                $totalPrice = $this->calculateTotalPrice($vendorCart);
+                Log::info('Calculated total price for vendor ' . $vendorId, ['totalPrice' => $totalPrice]);
     
                 $order = Order::create([
                     'user_id' => $request->user()->id,
@@ -282,7 +269,7 @@ class OrderController extends Controller
                     'payment_slip' => $filePath
                 ]);
     
-                foreach ($cart->items as $item) {
+                foreach ($items as $item) {
                     $orderDetail = $order->orderDetails()->create([
                         'product_id' => $item->product_id,
                         'quantity' => $item->quantity,
@@ -290,12 +277,13 @@ class OrderController extends Controller
                         'discount' => $item->discount,
                         'shipping_address' => $item->shipping_address
                     ]);
+                    
                     $this->applyPromotionToOrderDetail($orderDetail);
                     Log::info('Order detail created for item', ['order_detail' => $orderDetail]);
                 }
     
                 $order->save();
-                Log::info('Order saved for cart', ['order_id' => $order->id]);
+                Log::info('Order saved for vendor', ['order_id' => $order->id, 'vendor_id' => $vendorId]);
                 $orders[] = $order;
             }
     
@@ -318,6 +306,7 @@ class OrderController extends Controller
             return response()->json(['error' => 'Failed to create orders', 'message' => $e->getMessage()], 500);
         }
     }
+     
     
     protected function applyPromotionToOrderDetail(OrderDetail $orderDetail)
     {
@@ -344,19 +333,6 @@ class OrderController extends Controller
     
                 case 'ส่วนลดคงที่':
                     $orderDetail->discount = $promotion->discount_value * $orderDetail->quantity;
-                    break;
-    
-                case 'ซื้อหนึ่งแถมหนึ่ง':
-                    $freeItem = $orderDetail->replicate();
-                    $freeItem->quantity = $orderDetail->quantity;
-                    $freeItem->is_free = true;
-                    $freeItem->save();
-                    break;
-    
-                case 'จัดส่งฟรี':
-                    $cart = $orderDetail->cart;
-                    $cart->free_shipping = true;
-                    $cart->save();
                     break;
             }
             $orderDetail->save();
@@ -391,12 +367,20 @@ class OrderController extends Controller
                 $fileContents = file_get_contents($filePath);
                 $base64File = base64_encode($fileContents);
     
+                // บันทึกสลิปการชำระเงินและเปลี่ยนสถานะเป็น 'paid'
                 $order->payment_slip = $base64File;
                 $order->status = 'paid';
                 $order->save();
     
                 Log::info('File received', ['original_name' => $file->getClientOriginalName()]);
                 Log::info('File converted to base64 and stored', ['base64' => $base64File]);
+    
+                // ลดจำนวนสินค้าในสต็อก
+                foreach ($order->orderDetails as $orderDetail) {
+                    $product = $orderDetail->product;
+                    $product->stock -= $orderDetail->quantity;
+                    Log::info('Stock updated for product', ['product_id' => $product->id, 'new_stock' => $product->stock]);
+                }
     
                 $this->splitOrder($order);
     
@@ -414,8 +398,7 @@ class OrderController extends Controller
             Log::error('Error uploading payment slip', ['error' => $e->getMessage()]);
             return response()->json(['error' => 'Failed to upload payment slip', 'message' => $e->getMessage()], 500);
         }
-    }
-    
+    }    
     
     protected function splitOrder(Order $order)
 {

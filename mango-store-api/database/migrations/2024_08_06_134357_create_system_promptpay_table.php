@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('system_promptpay', function (Blueprint $table) {
             $table->id();
+            $table->string('account_name');
             $table->string('bank_name');
             $table->string('promptpay_number');
             $table->text('additional_qr_info')->nullable();

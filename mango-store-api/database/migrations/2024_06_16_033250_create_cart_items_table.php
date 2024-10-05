@@ -15,6 +15,7 @@ return new class extends Migration
             $table->unsignedInteger('quantity');
             $table->decimal('discount', 8, 2)->default(0);
             $table->boolean('is_free')->default(false);
+            $table->string('shipping_address')->nullable();
             $table->timestamps();
         });
     }

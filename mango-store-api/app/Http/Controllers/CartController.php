@@ -211,26 +211,6 @@ class CartController extends Controller
                     ]);
                     $item->save();
                     break;
-    
-                case 'ซื้อหนึ่งแถมหนึ่ง':
-                    $freeItem = $item->replicate();
-                    $freeItem->quantity = $quantity;
-                    $freeItem->is_free = true;
-                    Log::info('Applying buy one get one free', [
-                        'product_id' => $item->product_id,
-                        'freeQuantity' => $quantity,
-                    ]);
-                    $freeItem->save();
-                    break;
-    
-                case 'จัดส่งฟรี':
-                    $cart = $item->cart;
-                    $cart->free_shipping = true;
-                    Log::info('Applying free shipping', [
-                        'cart_id' => $cart->id,
-                    ]);
-                    $cart->save();
-                    break;
             }
         }
     }
