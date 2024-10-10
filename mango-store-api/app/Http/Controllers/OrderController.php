@@ -120,7 +120,7 @@ class OrderController extends Controller
         DB::beginTransaction();
     
         try {
-            Log::info('Order cancellation process started', ['order_id' => $orderId]);
+            Log::info('Order cancellation process started : ', ['order_id' => $orderId]);
     
             $order = Order::findOrFail($orderId);
     
