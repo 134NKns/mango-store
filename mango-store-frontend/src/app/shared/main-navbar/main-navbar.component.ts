@@ -6,6 +6,7 @@ import { LoginPageComponent } from '../../pages/auth-ui/login-page/login-page.co
 import { RegisterPageComponent } from '../../pages/auth-ui/register-page/register-page.component';
 import { EditPageComponent } from '../../pages/auth-ui/edit-page/edit-page.component';
 import { PromptPayPageComponent } from '../../pages/prompt-pay-page/prompt-pay-page.component';
+import { BannerManagementPageComponent } from '../../pages/banner-management-page/banner-management-page.component';
 import { AuthService } from '../../services/auth.service';
 import { ButtonModule } from 'primeng/button';
 import { CommonModule } from '@angular/common';
@@ -22,6 +23,7 @@ import { TabMenuModule } from 'primeng/tabmenu';
     RegisterPageComponent,
     PromptPayPageComponent,
     EditPageComponent,
+    BannerManagementPageComponent,
     ButtonModule,
     CommonModule,
     TabMenuModule
@@ -34,6 +36,7 @@ export class MainNavbarComponent implements OnInit, OnDestroy,AfterViewInit {
   loginHeader: string = 'เข้าสู่ระบบ';
   editHeader: string = 'แก้ไขข้อมูลส่วนตัว';
   promtPaySettingHeader: string = 'จัดการ PromptPay';
+  BannerSettingHeader: string = 'จัดการ Banner';
   registerRole: 'customer' | 'vendor' | null = null;
   registerHeader!: string;
   registerHeaderForCustomer: string = 'สมัครสมาชิกลูกค้า';
@@ -42,6 +45,7 @@ export class MainNavbarComponent implements OnInit, OnDestroy,AfterViewInit {
   isVisibleRegisterModal: boolean = false;
   isVisiblePromptPaySettingModal: boolean = false;
   isVisibleEditModal: boolean = false;
+  isVisibleBannerModal: boolean = false;
   items!: MenuItem[];
   private roleSubscription: Subscription;
 
@@ -109,6 +113,10 @@ export class MainNavbarComponent implements OnInit, OnDestroy,AfterViewInit {
     if (this.editPageComponent) {
       this.editPageComponent.me();
     }
+  }
+
+  openBannerModal() {
+    this.isVisibleBannerModal = true;
   }
 
   openPromptPaySettingModal() {
@@ -248,6 +256,12 @@ export class MainNavbarComponent implements OnInit, OnDestroy,AfterViewInit {
         label: 'จัดการ PromptPay ระบบ',
         icon: 'pi pi-fw pi-qrcode',
         command: () => this.openPromptPaySettingModal(), 
+        isRouterLink : false
+      },
+      {
+        label: 'จัดการ Banner',
+        icon: 'pi pi-fw pi-image',
+        command: () => this.openBannerModal(), 
         isRouterLink : false
       }
     ];

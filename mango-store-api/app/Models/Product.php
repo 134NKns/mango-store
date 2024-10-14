@@ -17,7 +17,8 @@ class Product extends Model
         'price', 
         'vendor_id',
         'stock',
-        'is_available'
+        'is_available',
+        'mango_type'
     ];
 
     // Define relationships

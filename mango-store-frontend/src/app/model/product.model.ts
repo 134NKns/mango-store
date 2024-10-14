@@ -10,6 +10,7 @@ export interface Product {
   is_available: boolean;
   images: ProductImage[];
   promotion: Promotion | null;
+  mango_type:string | null;
   selected?: boolean;
 }
 

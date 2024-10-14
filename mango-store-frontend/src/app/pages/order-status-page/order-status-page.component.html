@@ -6,7 +6,6 @@
         <tr>
           <th>ลำดับ</th>
           <th>ชื่อสินค้า</th>
-          <th>ชื่อลูกค้า</th>
           <th>รายละเอียดสินค้า</th>
           <th>ราคารวม</th>
           <th>สถานะการสั่งซื้อ</th>
@@ -23,9 +22,6 @@
                 {{data.product.name}}
               </span>
             }
-          </td>
-          <td>
-            {{ order.user.user_profile.firstname }} {{ order.user.user_profile.lastname }} 
           </td>
           <td>
             <button pButton class="main-button p-button-info w-full sm:w-auto" style="min-width: 150px;"

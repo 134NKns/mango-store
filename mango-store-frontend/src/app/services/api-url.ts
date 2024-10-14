@@ -42,5 +42,10 @@ export const API_URLS = {
   get_vendor_orders: 'http://localhost:8000/api/vendor/orders',
   // PromtPay endpoint
   promptpay_info: 'http://localhost:8000/api/system-promptpay',
+   // Banner endpoints
+   get_all_banners: 'http://localhost:8000/api/system-banner', // GET to retrieve all banners
+   add_banner: 'http://localhost:8000/api/system-banner', // POST to create new banner
+   update_banner: 'http://localhost:8000/api/system-banner', // PUT to update banner
+   delete_banner: 'http://localhost:8000/api/system-banner', // DELETE to delete a banner
 };
     

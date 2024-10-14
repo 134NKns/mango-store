@@ -401,54 +401,62 @@ class OrderController extends Controller
     }    
     
     protected function splitOrder(Order $order)
-{
-    $vendorOrders = [];
-    Log::info('Starting order split', ['order_id' => $order->id]);
-    
-    foreach ($order->orderDetails as $detail) {
-        $vendorId = $detail->product->vendor_id;
-        if (!isset($vendorOrders[$vendorId])) {
-            $vendorOrders[$vendorId] = [];
-        }
-        $vendorOrders[$vendorId][] = $detail;
-    }
-
-    Log::info('Grouped order details by vendor', ['vendorOrders' => $vendorOrders]);
-    
-    foreach ($vendorOrders as $vendorId => $details) {
-        $totalPrice = array_reduce($details, function($carry, $detail) {
-            return $carry + ($detail->price * $detail->quantity - $detail->discount);
-        }, 0);
-
-        Log::info('Calculating total price for vendor', ['vendor_id' => $vendorId, 'totalPrice' => $totalPrice]);
+    {
+        $vendorOrders = [];
+        Log::info('Starting order split', ['order_id' => $order->id]);
         
-        $vendorOrder = Order::create([
-            'user_id' => $order->user_id,
-            'total_price' => $totalPrice,
-            'status' => 'paid',
-            'payment_slip' => $order->payment_slip,
-        ]);
-
-        Log::info('Vendor order created', ['vendor_order_id' => $vendorOrder->id, 'vendor_id' => $vendorId]);
-
-        foreach ($details as $detail) {
-            $orderDetail = $vendorOrder->orderDetails()->create([
-                'product_id' => $detail->product_id,
-                'quantity' => $detail->quantity,
-                'price' => $detail->price,
-                'discount' => $detail->discount,
-                'shipping_address' => $detail->shipping_address
-            ]);
-            Log::info('Order detail created for vendor order', ['order_detail_id' => $orderDetail->id, 'vendor_order_id' => $vendorOrder->id]);
+        foreach ($order->orderDetails as $detail) {
+            $vendorId = $detail->product->vendor_id;
+            $shippingAddress = $detail->shipping_address;
+            
+            // ใช้ทั้ง vendor_id และ shipping_address ในการแยกคำสั่งซื้อ
+            $key = $vendorId . '|' . $shippingAddress;
+            
+            if (!isset($vendorOrders[$key])) {
+                $vendorOrders[$key] = [];
+            }
+            $vendorOrders[$key][] = $detail;
         }
-
-        $vendorOrder->save();
-        Log::info('Vendor order saved', ['vendor_order_id' => $vendorOrder->id]);
+    
+        Log::info('Grouped order details by vendor and shipping address', ['vendorOrders' => $vendorOrders]);
+        
+        foreach ($vendorOrders as $key => $details) {
+            list($vendorId, $shippingAddress) = explode('|', $key);
+    
+            $totalPrice = array_reduce($details, function($carry, $detail) {
+                return $carry + ($detail->price * $detail->quantity - $detail->discount);
+            }, 0);
+    
+            Log::info('Calculating total price for vendor', ['vendor_id' => $vendorId, 'totalPrice' => $totalPrice]);
+            
+            $vendorOrder = Order::create([
+                'user_id' => $order->user_id,
+                'total_price' => $totalPrice,
+                'status' => 'paid',
+                'payment_slip' => $order->payment_slip,
+            ]);
+    
+            Log::info('Vendor order created', ['vendor_order_id' => $vendorOrder->id, 'vendor_id' => $vendorId]);
+    
+            foreach ($details as $detail) {
+                $orderDetail = $vendorOrder->orderDetails()->create([
+                    'product_id' => $detail->product_id,
+                    'quantity' => $detail->quantity,
+                    'price' => $detail->price,
+                    'discount' => $detail->discount,
+                    'shipping_address' => $shippingAddress, // บันทึกที่อยู่จัดส่งเฉพาะของแต่ละ order
+                ]);
+                Log::info('Order detail created for vendor order', ['order_detail_id' => $orderDetail->id, 'vendor_order_id' => $vendorOrder->id]);
+            }
+    
+            $vendorOrder->save();
+            Log::info('Vendor order saved', ['vendor_order_id' => $vendorOrder->id]);
+        }
+    
+        $order->delete();
+        Log::info('Original order deleted after splitting', ['order_id' => $order->id]);
     }
-
-    $order->delete();
-    Log::info('Original order deleted after splitting', ['order_id' => $order->id]);
-}
+    
     
     protected function getCart(Request $request)
     {

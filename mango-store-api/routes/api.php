@@ -10,6 +10,7 @@ use App\Http\Controllers\OrderDetailController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\PromotionTypeController;
 use App\Http\Controllers\PromotionController;
+use App\Http\Controllers\BannerController;
 use App\Http\Controllers\SystemPromptpayController;
 
 Route::get('/hello', function () {
@@ -113,3 +114,26 @@ Route::group([
     Route::put('/', [SystemPromptpayController::class, 'update'])->middleware('role:admin');
     Route::delete('/', [SystemPromptpayController::class, 'destroy'])->middleware('role:admin');
 });
+
+
+// Banner Route
+Route::group([
+    'middleware' => ['api', 'jwt.cookie'],
+    'prefix' => 'system-banner'
+], function () {
+    // ดูรายการทั้งหมด
+    Route::get('/', [BannerController::class, 'index']); // ทุกคนสามารถดูได้
+    
+    // ดู Banner ตาม ID
+    Route::get('/show/{id}', [BannerController::class, 'show']);
+    
+    // สร้าง Banner (เฉพาะ admin)
+    Route::post('/', [BannerController::class, 'store'])->middleware('role:admin');
+    
+    // อัปเดต Banner (เฉพาะ admin)
+    Route::put('/{id}', [BannerController::class, 'update'])->middleware('role:admin');
+    
+    // ลบ Banner (เฉพาะ admin)
+    Route::delete('/{id}', [BannerController::class, 'destroy'])->middleware('role:admin');
+});
+

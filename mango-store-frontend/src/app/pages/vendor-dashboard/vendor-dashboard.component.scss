@@ -2,6 +2,11 @@
     font-size: 0.8rem;
 }
 
+:host ::ng-deep .uploadBtn .p-ripple{
+  width: 100% !important;
+  margin-bottom: 1rem;
+}
+
 .default-image {
     opacity: 0.5; /* Make default images look distinct */
   }

@@ -75,4 +75,16 @@
       <app-prompt-pay-page [(isVisiblePromptPaySettingModal)]="isVisiblePromptPaySettingModal"></app-prompt-pay-page>
     </div>
   </p-dialog>
+
+  <p-dialog
+    header="{{ BannerSettingHeader }}"
+    [(visible)]="isVisibleBannerModal"
+    [modal]="true"
+    [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" 
+    [style]="{ width: '70vw', height: '70vh'}"
+  >
+    <div class="appForm relative">
+      <app-banner-management-page [(isVisibleBannerModal)]="isVisibleBannerModal"></app-banner-management-page>
+    </div>
+  </p-dialog>
 </div>

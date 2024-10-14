@@ -17,6 +17,9 @@ import { CartService } from '../../services/cart.service';
 import { MessageService } from 'primeng/api';
 import { AuthService } from '../../services/auth.service';
 import { DividerModule } from 'primeng/divider';
+import { CarouselModule } from 'primeng/carousel';
+import { BannerService } from '../../services/banner.service';
+import { Banner } from '../../model/banner';
 
 @Component({
   selector: 'app-home-page',
@@ -31,7 +34,8 @@ import { DividerModule } from 'primeng/divider';
     PaginatorModule,
     ImageModule,
     DialogModule,
-    DividerModule
+    DividerModule,
+    CarouselModule
   ],
   templateUrl: './home-page.component.html',
   styleUrls: ['./home-page.component.scss'],
@@ -51,18 +55,35 @@ export class HomePageComponent implements OnInit, OnDestroy {
   quantity: number = 1;
   shippingAddress: string = '';
   userRole: string | null = null;
+  bannerImages!: any[];
   private roleSubscription!: Subscription;
+  banners: Banner[] = [];
+  private bannerSubscription!: Subscription;
 
   constructor(
     private productService: ProductService,
     private loadingService: LoadingService,
     private cartService: CartService,
     private messageService: MessageService,
-    private authService: AuthService
-  ) {}
+    private authService: AuthService,
+    private bannerService: BannerService
+  ) {
+    
+  }
 
   ngOnInit() {
-    this.fetchProducts();
+    this.bannerSubscription = this.bannerService.banners$.subscribe((banners: Banner[]) => {
+      this.banners = banners.sort((a, b) => (a.banner_order || 0) - (b.banner_order || 0));
+      
+      // Map ให้เข้ากับ carousel images
+      this.bannerImages = this.banners.map(banner => ({
+        image: 'data:image/png;base64,' + banner.url, // เปลี่ยนให้เป็น Base64 ถ้าจำเป็น
+        alt: banner.name
+      }));
+    });
+
+    // ดึงแบนเนอร์ครั้งแรก
+    this.bannerService.getAllBanners().subscribe();    this.fetchProducts();
     this.roleSubscription = this.authService.role$.subscribe(role => {
       console.log(role);
       this.userRole = role;
@@ -79,6 +100,24 @@ export class HomePageComponent implements OnInit, OnDestroy {
     if (this.roleSubscription) {
       this.roleSubscription.unsubscribe();
     }
+    if (this.bannerSubscription) {
+      this.bannerSubscription.unsubscribe();
+    }
+  }
+
+  fetchBanner(){
+    this.bannerService.getAllBanners().subscribe({
+      next: (banners: Banner[]) => {
+        this.banners = banners.sort((a, b) => (a.banner_order || 0) - (b.banner_order || 0));
+        this.bannerImages = this.banners.map(banner => ({
+          image: banner.url,
+          alt: banner.name 
+        }));
+      },
+      error: (error) => {
+        console.error('Error fetching banners:', error);
+      }
+    });
   }
 
   fetchProducts(searchParams: { name?: string } = {}) {

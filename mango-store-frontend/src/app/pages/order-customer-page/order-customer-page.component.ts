@@ -106,6 +106,7 @@ export class OrderCustomerPageComponent implements OnInit {
   }
 
   viewOrderDetails(order: Order): void {
+    console.log('this order : ',order);
     this.selectedOrder = order;
     this.displayDialog = true;
   }

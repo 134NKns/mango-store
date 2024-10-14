@@ -88,6 +88,12 @@ export class VendorDashboardComponent implements OnInit {
   vendor_id: string | null = null;
   imagePreview: string | null = null;
   promotionTypes: any[] = [];
+  mangoTypes = [
+    { id: 'มะม่วงสุก', name: 'มะม่วงสุก' },
+    { id: 'มะม่วงดิบ', name: 'มะม่วงดิบ' },
+    { id: 'มะม่วงแปรรูป', name: 'มะม่วงแปรรูป' }
+  ];
+  
 
   @ViewChild('fileUploadAdd', { static: false }) fileUploadAdd!: FileUpload;
   @ViewChild('fileUploadEdit', { static: false }) fileUploadEdit!: FileUpload;
@@ -109,6 +115,7 @@ export class VendorDashboardComponent implements OnInit {
       vendor_id: [this.vendor_id, Validators.required],
       stock: [0, Validators.required],
       is_available: [false, Validators.required],
+      mango_type: [''],
       image: [null]
     });
 
@@ -118,6 +125,7 @@ export class VendorDashboardComponent implements OnInit {
       price: [0, [Validators.required, Validators.min(0)]],
       stock: [0, Validators.required],
       is_available: [false, Validators.required],
+      mango_type: [''],
       image: [null]
     });
 
@@ -204,18 +212,23 @@ export class VendorDashboardComponent implements OnInit {
 
   showEditProductDialog(product: Product) {
     this.editingProduct = product;
+    console.log(product);
+
     let is_available_converted = product.is_available ? true : false;
     this.editProductForm.patchValue({
-      name: product.name,
-      description: product.description,
-      price: product.price,
-      stock: product.stock,
-      is_available: is_available_converted,
-      image: null
+        name: product.name,
+        description: product.description,
+        price: product.price,
+        stock: product.stock,
+        is_available: is_available_converted,
+        image: null,
+        mango_type: product.mango_type || '' // ถ้า mango_type เป็น null หรือ '' จะใช้ค่าเริ่มต้น ''
     });
+
     this.imagePreview = product.images && product.images.length > 0 ? product.images[0].image_data : null;
     this.displayEditProductDialog = true;
-  }
+}
+
 
   showAddPromotionDialog() {
     if (this.selectedProducts.length === 0) {
@@ -278,19 +291,27 @@ export class VendorDashboardComponent implements OnInit {
       formData.append('description', this.addProductForm.get('description')?.value);
       formData.append('price', this.addProductForm.get('price')?.value);
       formData.append('stock', this.addProductForm.get('stock')?.value);
-      formData.append('is_available', this.addProductForm.get('is_available')?.value);
-
+      const mangoTypeValue = this.addProductForm.get('mango_type')?.value;
+      console.log('Selected Mango Type:', mangoTypeValue);
+      
+      if (!mangoTypeValue || mangoTypeValue === 'undefined') {
+          this.messageService.add({ severity: 'error', summary: 'ข้อผิดพลาด', detail: 'กรุณาเลือกประเภทมะม่วง', life: 3000 });
+          return;
+      }
+      formData.append('mango_type', mangoTypeValue);
+            formData.append('is_available', this.addProductForm.get('is_available')?.value);
+  
       if (this.vendor_id) {
         formData.append('vendor_id', this.vendor_id);
       } else {
         this.messageService.add({severity: 'error', summary: 'ข้อผิดพลาด', detail: 'Vendor ID เป็นค่าว่าง', life: 3000});
         return;
       }
-
+  
       if (this.selectedFile) {
         formData.append('image', this.selectedFile, this.selectedFile.name);
       }
-
+  
       this.productService.addProduct(formData).subscribe({
         next: (newProduct) => {
           this.refreshProductList();
@@ -308,7 +329,7 @@ export class VendorDashboardComponent implements OnInit {
       this.logFormErrors(this.addProductForm);
     }
   }
-
+  
   onEditProduct() {
     if (this.editProductForm.valid && this.editingProduct) {
       const formData = new FormData();
@@ -316,14 +337,22 @@ export class VendorDashboardComponent implements OnInit {
       formData.append('description', this.editProductForm.get('description')?.value);
       formData.append('price', this.editProductForm.get('price')?.value);
       formData.append('stock', this.editProductForm.get('stock')?.value);
-      formData.append('is_available', this.editProductForm.get('is_available')?.value);
+      const mangoTypeValue = this.editProductForm.get('mango_type')?.value;
+      console.log('Selected Mango Type:', mangoTypeValue);
+      
+      if (!mangoTypeValue || mangoTypeValue === 'undefined') {
+          this.messageService.add({ severity: 'error', summary: 'ข้อผิดพลาด', detail: 'กรุณาเลือกประเภทมะม่วง', life: 3000 });
+          return;
+      }
+      formData.append('mango_type', mangoTypeValue);
+            formData.append('is_available', this.editProductForm.get('is_available')?.value);
       formData.append('delete_image', this.deleteImageFlag ? 'true' : 'false');
-
+  
       if (this.selectedFile) {
         formData.append('image', this.selectedFile, this.selectedFile.name);
         formData.append('delete_image', 'false');
       }
-
+  
       this.productService.editProduct(this.editingProduct.id, formData).subscribe({
         next: (updatedProduct) => {
           this.refreshProductList();
@@ -343,7 +372,7 @@ export class VendorDashboardComponent implements OnInit {
       this.logFormErrors(this.editProductForm);
     }
   }
-
+  
   onAddPromotion() {
     if (this.addPromotionForm.valid) {
       const promotionData = {

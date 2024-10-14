@@ -1,0 +1,84 @@
+<div class="spinner-container-dialog" *ngIf="loading">
+    <p-progressSpinner 
+      styleClass="w-4rem h-4rem" 
+      strokeWidth="8" 
+      fill="var(--surface-ground)" 
+      animationDuration=".5s"></p-progressSpinner>
+  </div>
+
+<div class="flex justify-content-end mb-3">
+    <!-- ปุ่มสำหรับเพิ่มแบนเนอร์ -->
+    <p-button icon="pi pi-plus" label="Add Banner" class="p-button-success" (click)="onAddBanner()"></p-button>
+</div>
+
+<p-dataView #dv [value]="banners">
+    <ng-template pTemplate="list" let-banner>
+        <div class="grid grid-nogutter">
+            <div class="col-12" *ngFor="let item of banners; let first = first">
+                <div class="flex flex-column sm:flex-row sm:align-items-center p-4 gap-3" [ngClass]="{ 'border-top-1 surface-border': !first }">
+                    <div class="md:w-10rem relative">
+                        <!-- แสดงรูปภาพ Base64 -->
+                        <img class="block xl:block mx-auto border-round w-full" [src]="'data:image/png;base64,' + item.url" [alt]="item.name" />
+                    </div>
+                    <div class="flex flex-column md:flex-row justify-content-between md:align-items-center flex-1 gap-4">
+                        <div class="flex flex-row md:flex-column justify-content-between align-items-start gap-2">
+                            <div>
+                                <span class="font-medium text-secondary text-sm">{{ 'Order: ' + item.banner_order }}</span>
+                                <div class="text-lg font-medium text-900 mt-2">{{ item.name }}</div>
+                            </div>
+                        </div> 
+                        <div class="flex flex-column md:align-items-end gap-5">
+                            <div class="flex flex-row-reverse md:flex-row gap-2">
+                                <!-- ปุ่มลบแบนเนอร์ -->
+                                <p-button icon="pi pi-trash" label="Delete" class="p-button-danger" severity="danger" (click)="onDeleteBanner(item.id)" />
+                                <!-- ปุ่มแก้ไขแบนเนอร์ -->
+                                <p-button icon="pi pi-pencil" label="Edit" class="p-button-warning" (click)="onEditBanner(item)" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+</p-dataView>
+
+<p-dialog *ngIf="banner" header="เพิ่ม/แก้ไข Banner" [modal]="true" [(visible)]="visible" [style]="{ width: '100%' }" (onHide)="onCancel(fileUploader)">
+    <form class="mt-5">
+        <!-- ชื่อแบนเนอร์ -->
+        <div class="p-fluid mb-3 inputField">
+            <p-floatLabel>
+                <input pInputText id="bannerName" [(ngModel)]="banner.name" name="bannerName" required />
+                <label for="bannerName">ชื่อแบนเนอร์</label>
+            </p-floatLabel>
+        </div>
+
+        <!-- ลำดับของแบนเนอร์ -->
+        <div class="p-fluid mb-3 inputField">
+            <p-floatLabel>
+                <input pInputText id="bannerOrder" type="number" [(ngModel)]="banner.banner_order" name="bannerOrder" required />
+                <label for="bannerOrder">ลำดับ</label>
+            </p-floatLabel>
+        </div>
+
+        <span style="color:red">*ความสูงที่เหมาะสมควรมีขนาด 480px</span>
+
+        <!-- อัปโหลดรูปภาพ -->
+        <div class="mb-5 inputField">
+            <p-fileUpload #fileUploader name="bannerImage" mode="basic" accept="image/*" maxFileSize="1000000" (onSelect)="onFileSelect($event)" chooseLabel="เลือกไฟล์รูปภาพ" />
+        </div>
+
+        <!-- Preview รูปภาพแบนเนอร์และปุ่มลบ -->
+        <div class="mb-5" *ngIf="bannerImagePreview">
+            <img [src]="bannerImagePreview" alt="Banner Image Preview" class="w-full border-round" />
+            <div class="flex justify-content-end mt-2">
+                <p-button label="ลบรูป" icon="pi pi-times" class="p-button-danger" (click)="removeImage(fileUploader)" />
+            </div>
+        </div>
+
+        <!-- ปุ่ม Cancel และ Save -->
+        <div class="flex justify-content-end gap-2">
+            <p-button label="ยกเลิก" icon="pi pi-times" severity="secondary" (onClick)="onCancel(fileUploader)" />
+            <p-button label="บันทึก" icon="pi pi-check" (onClick)="onSave(fileUploader)" />
+        </div>
+    </form>
+</p-dialog>

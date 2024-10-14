@@ -1,3 +1,15 @@
 :host {
-  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* ใช้ความสูงเต็มของ viewport */
+}
+
+.routerBox {
+  flex-grow: 1; /* ทำให้คอนเทนเนอร์ของเนื้อหาเติบโตเพื่อใช้พื้นที่ที่เหลือ */
+}
+
+footer {
+  width: 100%;
+  height: auto;
+  bottom: 0;
 }

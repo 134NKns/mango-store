@@ -175,7 +175,6 @@ export class OrderStatusPageComponent implements OnInit {
   }
 
   viewOrderDetails(order : Order){
-    console.log(order);
     this.displayOrderDetailsModal = true;
     this.ordersDetail = order;
   }

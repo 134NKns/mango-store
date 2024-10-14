@@ -19,6 +19,7 @@ return new class extends Migration
             $table->foreignId('vendor_id')->nullable()->constrained('users');
             $table->integer('stock')->default(0); // Quantity of products in stock
             $table->boolean('is_available')->default(true); // Flag to indicate if the product is available for sale
+            $table->enum('mango_type', ['มะม่วงสุก', 'มะม่วงดิบ', 'มะม่วงแปรรูป', ''])->nullable();
             $table->timestamps();
         });
         

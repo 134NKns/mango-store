@@ -41,6 +41,7 @@
                          [style.top.px]="4">
                   </p-tag>
                   <div class="text-lg font-medium text-900 mt-2">{{ item.name }}</div>
+                  <div class="text-sm text-secondary mt-2">{{ item.mango_type }}</div>
                   <div class="text-sm text-secondary mt-2">{{ item.description }}</div>
                 </div>
               </div>
@@ -93,6 +94,18 @@
       </div>
       <div class="p-field">
         <p-floatLabel>
+          <p-dropdown 
+              formControlName="mango_type"
+              [options]="mangoTypes" 
+              optionLabel="name" 
+              placeholder="เลือกประเภทมะม่วง"
+              optionValue="id">
+          </p-dropdown>
+          <label for="mangoTypes">เลือกประเภทมะม่วง</label>
+      </p-floatLabel>
+      </div>
+      <div class="p-field">
+        <p-floatLabel>
           <p-inputNumber inputId="stock" formControlName="stock" showButtons="true"></p-inputNumber>
           <label for="stock">Stock</label>
         </p-floatLabel>
@@ -107,7 +120,8 @@
       </div>
       
       <div class="p-field">
-        <p-fileUpload 
+        <div class="uploadBtn">
+          <p-fileUpload 
             #fileUploadAdd
             mode="basic" 
             chooseLabel="รูปสินค้า" 
@@ -116,12 +130,19 @@
             url="https://www.primefaces.org/cdn/api/upload.php" 
             accept="image/*" 
             maxFileSize="2097152" 
+            styleClass="width:100%"
             (onSelect)="onFileChange($event)">
-        </p-fileUpload> 
+          </p-fileUpload> 
+        </div>
+
+        <div class="deleteBtn">
+          <p-button *ngIf="imagePreview" icon="pi pi-trash" label="ลบรูปภาพ" class="mt-2" severity="danger" (click)="clearFileSelection('add'); setDeleteImageFlag()"></p-button>
+        </div>
+        
         <div *ngIf="imagePreview">
           <img [src]="imagePreview" [alt]="'Preview'" style="width: 100px; height: auto; margin-top: 10px;">
-          <p-button label="ลบรูปภาพ" icon="pi pi-times" (click)="clearFileSelection('add')" severity="danger"></p-button>
         </div>
+        
       </div>
     </div>
     <p-footer>
@@ -141,6 +162,18 @@
           <input pInputText formControlName="name" id="editName" type="text" />
           <label for="editName">ชื่อสินค้า</label>
         </p-floatLabel>
+      </div>
+      <div class="p-field">
+        <p-floatLabel>
+          <p-dropdown 
+              formControlName="mango_type"
+              [options]="mangoTypes" 
+              optionLabel="name" 
+              placeholder="เลือกประเภทมะม่วง"
+              optionValue="id">
+          </p-dropdown>
+          <label for="mango_type">เลือกประเภทมะม่วง</label>
+      </p-floatLabel>
       </div>
       <div class="p-field">
         <p-floatLabel>
@@ -169,7 +202,8 @@
         </div>
       </div>
       <div class="p-field">
-        <p-fileUpload 
+        <div class="uploadBtn">
+          <p-fileUpload 
             #fileUploadEdit
             mode="basic" 
             chooseLabel="รูปสินค้า" 
@@ -178,14 +212,17 @@
             url="https://www.primefaces.org/cdn/api/upload.php" 
             accept="image/*" 
             maxFileSize="2097152" 
+            styleClass="width:100%"
             (onSelect)="onFileChange($event)">
-        </p-fileUpload> 
+      </p-fileUpload> 
+        </div>
+
+        <div class="deleteBtn">
+          <p-button *ngIf="imagePreview" icon="pi pi-trash" label="ลบรูปภาพ" class="mt-2" severity="danger" (click)="clearFileSelection('edit'); setDeleteImageFlag()"></p-button>
+        </div>
         <div *ngIf="imagePreview" style="margin-top: 10px;">
           <img [src]="imagePreview" [alt]="'Preview'" style="width: 100px; height: auto;">
         </div>
-      </div>
-      <div class="p-field" *ngIf="imagePreview">
-        <p-button icon="pi pi-trash" label="ลบรูปภาพ" severity="danger" (click)="clearFileSelection('edit'); setDeleteImageFlag()"></p-button>
       </div>
     </div>
     <p-footer>

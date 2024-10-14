@@ -4,7 +4,9 @@
   
 
   :host ::ng-deep .p-datatable-wrapper {
-    min-height: 80vh;
+    height: calc(100%);
+    height: -moz-calc(100%);
+    height: -webkit-calc(100%);
   }
 
   :host ::ng-deep .p-tag{

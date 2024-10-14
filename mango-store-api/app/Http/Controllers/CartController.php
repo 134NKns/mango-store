@@ -30,18 +30,21 @@ class CartController extends Controller
             'quantity' => 'required|integer|min:1',
             'shipping_address' => 'required|string|max:255'
         ]);
-
+    
         $cart = $this->getCart($request);
-
+    
         if (!$cart) {
             return response()->json(['message' => 'Unable to find or create cart'], 500);
         }
-
-        $item = $cart->items()->where('product_id', $validatedData['product_id'])->first();
-
+    
+        // ตรวจสอบทั้ง product_id และ shipping_address
+        $item = $cart->items()
+            ->where('product_id', $validatedData['product_id'])
+            ->where('shipping_address', $validatedData['shipping_address'])
+            ->first();
+    
         if ($item) {
             $item->quantity += $validatedData['quantity'];
-            $item->shipping_address = $validatedData['shipping_address'];
             $item->save();
         } else {
             $item = $cart->items()->create([
@@ -50,15 +53,16 @@ class CartController extends Controller
                 'shipping_address' => $validatedData['shipping_address'],
             ]);
         }
-
+    
         $this->applyPromotion($item, $validatedData['quantity']);
-
+    
         $totalPrice = $this->calculateTotalPrice($cart);
-
+    
         $cart = $this->applyPromotionsToCart($cart);
-
+    
         return response()->json(['cart' => $cart->load('items.product.promotion.promotionType'), 'total_price' => $totalPrice]);
     }
+    
 
     public function updateItem(Request $request, $itemId)
     {
@@ -66,19 +70,20 @@ class CartController extends Controller
             'quantity' => 'required|integer|min:0',
             'shipping_address' => 'sometimes|required|string|max:255'
         ]);
-
+    
         $cart = $this->getCart($request);
-
+    
         if (!$cart) {
             return response()->json(['message' => 'Cart not found'], 404);
         }
-
+    
+        // ตรวจสอบ item จาก $itemId แทนที่จะเป็น product_id อย่างเดียว
         $item = $cart->items()->find($itemId);
-
+    
         if (!$item) {
             return response()->json(['message' => 'Item not found'], 404);
         }
-
+    
         if ($validatedData['quantity'] == 0) {
             $item->delete();
         } else {
@@ -87,16 +92,17 @@ class CartController extends Controller
                 $item->shipping_address = $validatedData['shipping_address'];
             }
             $item->save();
-
+    
             $this->applyPromotion($item, $validatedData['quantity']);
         }
-
+    
         $totalPrice = $this->calculateTotalPrice($cart);
-
+    
         $cart = $this->applyPromotionsToCart($cart);
-
+    
         return response()->json(['cart' => $cart->load('items.product.promotion.promotionType'), 'total_price' => $totalPrice]);
     }
+    
 
     public function removeItem(Request $request, $itemId)
     {
