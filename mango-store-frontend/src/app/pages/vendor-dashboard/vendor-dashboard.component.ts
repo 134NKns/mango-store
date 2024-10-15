@@ -93,7 +93,7 @@ export class VendorDashboardComponent implements OnInit {
     { id: 'มะม่วงดิบ', name: 'มะม่วงดิบ' },
     { id: 'มะม่วงแปรรูป', name: 'มะม่วงแปรรูป' }
   ];
-  
+
 
   @ViewChild('fileUploadAdd', { static: false }) fileUploadAdd!: FileUpload;
   @ViewChild('fileUploadEdit', { static: false }) fileUploadEdit!: FileUpload;
@@ -154,7 +154,7 @@ export class VendorDashboardComponent implements OnInit {
     if (this.vendor_id) {
       this.loadProducts();
     } else {
-      this.messageService.add({severity: 'error', summary: 'ข้อผิดพลาด', detail: 'ไม่พบ Vendor ID', life: 3000});
+      this.messageService.add({ severity: 'error', summary: 'ข้อผิดพลาด', detail: 'ไม่พบ Vendor ID', life: 3000 });
     }
     this.loadPromotionTypes();
   }
@@ -188,7 +188,7 @@ export class VendorDashboardComponent implements OnInit {
         }
       });
     } else {
-      this.messageService.add({severity: 'error', summary: 'ข้อผิดพลาด', detail: 'ไม่พบ Vendor ID', life: 3000});
+      this.messageService.add({ severity: 'error', summary: 'ข้อผิดพลาด', detail: 'ไม่พบ Vendor ID', life: 3000 });
     }
   }
 
@@ -216,23 +216,23 @@ export class VendorDashboardComponent implements OnInit {
 
     let is_available_converted = product.is_available ? true : false;
     this.editProductForm.patchValue({
-        name: product.name,
-        description: product.description,
-        price: product.price,
-        stock: product.stock,
-        is_available: is_available_converted,
-        image: null,
-        mango_type: product.mango_type || '' // ถ้า mango_type เป็น null หรือ '' จะใช้ค่าเริ่มต้น ''
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      stock: product.stock,
+      is_available: is_available_converted,
+      image: null,
+      mango_type: product.mango_type || '' // ถ้า mango_type เป็น null หรือ '' จะใช้ค่าเริ่มต้น ''
     });
 
     this.imagePreview = product.images && product.images.length > 0 ? product.images[0].image_data : null;
     this.displayEditProductDialog = true;
-}
+  }
 
 
   showAddPromotionDialog() {
     if (this.selectedProducts.length === 0) {
-      this.messageService.add({severity: 'warn', summary: 'คำเตือน', detail: 'กรุณาเลือกสินค้าที่ต้องการเพิ่มโปรโมชั่นอย่างน้อยหนึ่งรายการ', life: 3000});
+      this.messageService.add({ severity: 'warn', summary: 'คำเตือน', detail: 'กรุณาเลือกสินค้าที่ต้องการเพิ่มโปรโมชั่นอย่างน้อยหนึ่งรายการ', life: 3000 });
       return;
     }
     this.displayAddPromotionDialog = true;
@@ -240,22 +240,22 @@ export class VendorDashboardComponent implements OnInit {
 
   showEditPromotionDialog(product: Product) {
     if (product?.promotion) {
-        const promotionType = this.promotionTypes.find(type => type.id === product.promotion?.promotion_type_id) ?? null;
-        
-        this.editPromotionForm.patchValue({
-            promotion_type_id: promotionType,
-            discount_value: product.promotion?.discount_value,
-            start_date: product.promotion?.start_date,
-            end_date: product.promotion?.end_date,
-            min_quantity: product.promotion?.min_quantity,
-            min_price: product.promotion?.min_price,
-            description: product.promotion?.description
-        });
-        
-        this.selectedProducts = [product];  // Ensure selectedProduct is set
-        this.displayEditPromotionDialog = true;
+      const promotionType = this.promotionTypes.find(type => type.id === product.promotion?.promotion_type_id) ?? null;
+
+      this.editPromotionForm.patchValue({
+        promotion_type_id: promotionType,
+        discount_value: product.promotion?.discount_value,
+        start_date: product.promotion?.start_date,
+        end_date: product.promotion?.end_date,
+        min_quantity: product.promotion?.min_quantity,
+        min_price: product.promotion?.min_price,
+        description: product.promotion?.description
+      });
+
+      this.selectedProducts = [product];  // Ensure selectedProduct is set
+      this.displayEditPromotionDialog = true;
     } else {
-        this.messageService.add({ severity: 'warn', summary: 'คำเตือน', detail: 'สินค้านี้ไม่มีโปรโมชั่นให้แก้ไข', life: 3000 });
+      this.messageService.add({ severity: 'warn', summary: 'คำเตือน', detail: 'สินค้านี้ไม่มีโปรโมชั่นให้แก้ไข', life: 3000 });
     }
   }
 
@@ -293,43 +293,43 @@ export class VendorDashboardComponent implements OnInit {
       formData.append('stock', this.addProductForm.get('stock')?.value);
       const mangoTypeValue = this.addProductForm.get('mango_type')?.value;
       console.log('Selected Mango Type:', mangoTypeValue);
-      
+
       if (!mangoTypeValue || mangoTypeValue === 'undefined') {
-          this.messageService.add({ severity: 'error', summary: 'ข้อผิดพลาด', detail: 'กรุณาเลือกประเภทมะม่วง', life: 3000 });
-          return;
+        this.messageService.add({ severity: 'error', summary: 'ข้อผิดพลาด', detail: 'กรุณาเลือกประเภทมะม่วง', life: 3000 });
+        return;
       }
       formData.append('mango_type', mangoTypeValue);
-            formData.append('is_available', this.addProductForm.get('is_available')?.value);
-  
+      formData.append('is_available', this.addProductForm.get('is_available')?.value);
+
       if (this.vendor_id) {
         formData.append('vendor_id', this.vendor_id);
       } else {
-        this.messageService.add({severity: 'error', summary: 'ข้อผิดพลาด', detail: 'Vendor ID เป็นค่าว่าง', life: 3000});
+        this.messageService.add({ severity: 'error', summary: 'ข้อผิดพลาด', detail: 'Vendor ID เป็นค่าว่าง', life: 3000 });
         return;
       }
-  
+
       if (this.selectedFile) {
-        formData.append('image', this.selectedFile, this.selectedFile.name);
+        formData.append('image', this.selectedFile, this.selectedFile.name);        
       }
-  
+
       this.productService.addProduct(formData).subscribe({
         next: (newProduct) => {
           this.refreshProductList();
           this.displayAddProductDialog = false;
           this.resetForm(this.addProductForm);
           this.clearFileSelection('add');
-          this.messageService.add({severity: 'success', summary: 'สำเร็จ', detail: 'เพิ่มสินค้าสำเร็จ', life: 3000});
+          this.messageService.add({ severity: 'success', summary: 'สำเร็จ', detail: 'เพิ่มสินค้าสำเร็จ', life: 3000 });
         },
         error: (error) => {
           console.error('Error adding product:', error);
-          this.messageService.add({severity: 'error', summary: 'ข้อผิดพลาด', detail: 'เกิดข้อผิดพลาดในการเพิ่มสินค้า', life: 3000});
+          this.messageService.add({ severity: 'error', summary: 'ข้อผิดพลาด', detail: 'เกิดข้อผิดพลาดในการเพิ่มสินค้า', life: 3000 });
         }
       });
     } else {
       this.logFormErrors(this.addProductForm);
     }
   }
-  
+
   onEditProduct() {
     if (this.editProductForm.valid && this.editingProduct) {
       const formData = new FormData();
@@ -339,20 +339,20 @@ export class VendorDashboardComponent implements OnInit {
       formData.append('stock', this.editProductForm.get('stock')?.value);
       const mangoTypeValue = this.editProductForm.get('mango_type')?.value;
       console.log('Selected Mango Type:', mangoTypeValue);
-      
+
       if (!mangoTypeValue || mangoTypeValue === 'undefined') {
-          this.messageService.add({ severity: 'error', summary: 'ข้อผิดพลาด', detail: 'กรุณาเลือกประเภทมะม่วง', life: 3000 });
-          return;
+        this.messageService.add({ severity: 'error', summary: 'ข้อผิดพลาด', detail: 'กรุณาเลือกประเภทมะม่วง', life: 3000 });
+        return;
       }
       formData.append('mango_type', mangoTypeValue);
-            formData.append('is_available', this.editProductForm.get('is_available')?.value);
+      formData.append('is_available', this.editProductForm.get('is_available')?.value);
       formData.append('delete_image', this.deleteImageFlag ? 'true' : 'false');
-  
+
       if (this.selectedFile) {
         formData.append('image', this.selectedFile, this.selectedFile.name);
         formData.append('delete_image', 'false');
       }
-  
+
       this.productService.editProduct(this.editingProduct.id, formData).subscribe({
         next: (updatedProduct) => {
           this.refreshProductList();
@@ -360,19 +360,19 @@ export class VendorDashboardComponent implements OnInit {
           this.deleteImageFlag = false;
           this.resetForm(this.editProductForm);
           this.clearFileSelection('edit');
-          this.messageService.add({severity: 'success', summary: 'สำเร็จ', detail: 'แก้ไขสินค้าสำเร็จ', life: 3000});
+          this.messageService.add({ severity: 'success', summary: 'สำเร็จ', detail: 'แก้ไขสินค้าสำเร็จ', life: 3000 });
         },
         error: (error) => {
           this.deleteImageFlag = false;
           console.error('Error updating product:', error);
-          this.messageService.add({severity: 'error', summary: 'ข้อผิดพลาด', detail: 'เกิดข้อผิดพลาดในการแก้ไขสินค้า', life: 3000});
+          this.messageService.add({ severity: 'error', summary: 'ข้อผิดพลาด', detail: 'เกิดข้อผิดพลาดในการแก้ไขสินค้า', life: 3000 });
         }
       });
     } else {
       this.logFormErrors(this.editProductForm);
     }
   }
-  
+
   onAddPromotion() {
     if (this.addPromotionForm.valid) {
       const promotionData = {
@@ -387,11 +387,11 @@ export class VendorDashboardComponent implements OnInit {
         this.promotionService.addPromotion(promotion).subscribe({
           next: () => {
             this.refreshProductList();
-            this.messageService.add({severity: 'success', summary: 'สำเร็จ', detail: 'เพิ่มโปรโมชั่นสำเร็จ', life: 3000});
+            this.messageService.add({ severity: 'success', summary: 'สำเร็จ', detail: 'เพิ่มโปรโมชั่นสำเร็จ', life: 3000 });
           },
           error: (error) => {
             console.error('Error adding promotion:', error);
-            this.messageService.add({severity: 'error', summary: 'ข้อผิดพลาด', detail: 'เกิดข้อผิดพลาดในการเพิ่มโปรโมชั่น', life: 3000});
+            this.messageService.add({ severity: 'error', summary: 'ข้อผิดพลาด', detail: 'เกิดข้อผิดพลาดในการเพิ่มโปรโมชั่น', life: 3000 });
           }
         });
       });
@@ -402,43 +402,43 @@ export class VendorDashboardComponent implements OnInit {
 
   onEditPromotion() {
     if (this.editPromotionForm.valid) {
-        const promotionType = this.editPromotionForm.value.promotion_type_id;
-        
-        if (!promotionType || !promotionType.id) {
-            this.messageService.add({ severity: 'error', summary: 'ข้อผิดพลาด', detail: 'ไม่สามารถอ่านค่า ID ของประเภทโปรโมชั่นได้', life: 3000 });
-            return;
+      const promotionType = this.editPromotionForm.value.promotion_type_id;
+
+      if (!promotionType || !promotionType.id) {
+        this.messageService.add({ severity: 'error', summary: 'ข้อผิดพลาด', detail: 'ไม่สามารถอ่านค่า ID ของประเภทโปรโมชั่นได้', life: 3000 });
+        return;
+      }
+
+      const promotionData = {
+        ...this.editPromotionForm.value,
+        promotion_type_id: promotionType.id
+      };
+      const selectedProduct = this.selectedProducts[0];
+
+      if (!selectedProduct || !selectedProduct.promotion) {
+        this.messageService.add({ severity: 'error', summary: 'ข้อผิดพลาด', detail: 'ไม่พบโปรโมชั่นสำหรับสินค้านี้', life: 3000 });
+        return;
+      }
+
+      const promotion: Promotion = {
+        ...promotionData,
+        product_id: selectedProduct.id,
+        id: selectedProduct.promotion.id
+      };
+
+      this.promotionService.updatePromotion(promotion).subscribe({
+        next: () => {
+          this.loadProducts();
+          this.messageService.add({ severity: 'success', summary: 'สำเร็จ', detail: 'แก้ไขโปรโมชั่นสำเร็จ', life: 3000 });
+        },
+        error: (error) => {
+          console.error('Error updating promotion:', error);
+          this.messageService.add({ severity: 'error', summary: 'ข้อผิดพลาด', detail: 'เกิดข้อผิดพลาดในการแก้ไขโปรโมชั่น', life: 3000 });
         }
-
-        const promotionData = { 
-            ...this.editPromotionForm.value, 
-            promotion_type_id: promotionType.id 
-        };
-        const selectedProduct = this.selectedProducts[0];
-
-        if (!selectedProduct || !selectedProduct.promotion) {
-            this.messageService.add({ severity: 'error', summary: 'ข้อผิดพลาด', detail: 'ไม่พบโปรโมชั่นสำหรับสินค้านี้', life: 3000 });
-            return;
-        }
-
-        const promotion: Promotion = {
-            ...promotionData,
-            product_id: selectedProduct.id,
-            id: selectedProduct.promotion.id
-        };
-
-        this.promotionService.updatePromotion(promotion).subscribe({
-            next: () => {
-                this.loadProducts();
-                this.messageService.add({ severity: 'success', summary: 'สำเร็จ', detail: 'แก้ไขโปรโมชั่นสำเร็จ', life: 3000 });
-            },
-            error: (error) => {
-                console.error('Error updating promotion:', error);
-                this.messageService.add({ severity: 'error', summary: 'ข้อผิดพลาด', detail: 'เกิดข้อผิดพลาดในการแก้ไขโปรโมชั่น', life: 3000 });
-            }
-        });
-        this.displayEditPromotionDialog = false;
+      });
+      this.displayEditPromotionDialog = false;
     } else {
-        this.messageService.add({ severity: 'warn', summary: 'คำเตือน', detail: 'กรุณากรอกข้อมูลให้ครบถ้วน', life: 3000 });
+      this.messageService.add({ severity: 'warn', summary: 'คำเตือน', detail: 'กรุณากรอกข้อมูลให้ครบถ้วน', life: 3000 });
     }
   }
 
@@ -452,18 +452,18 @@ export class VendorDashboardComponent implements OnInit {
             this.promotionService.deletePromotion(promotionId).subscribe({
               next: () => {
                 this.loadProducts();
-                this.messageService.add({severity: 'success', summary: 'สำเร็จ', detail: 'ลบโปรโมชั่นสำเร็จ', life: 3000});
+                this.messageService.add({ severity: 'success', summary: 'สำเร็จ', detail: 'ลบโปรโมชั่นสำเร็จ', life: 3000 });
               },
               error: (error) => {
                 console.error('Error deleting promotion:', error);
-                this.messageService.add({severity: 'error', summary: 'ข้อผิดพลาด', detail: 'เกิดข้อผิดพลาดในการลบโปรโมชั่น', life: 3000});
+                this.messageService.add({ severity: 'error', summary: 'ข้อผิดพลาด', detail: 'เกิดข้อผิดพลาดในการลบโปรโมชั่น', life: 3000 });
               }
             });
           }
         }
       });
     } else {
-      this.messageService.add({severity: 'warn', summary: 'คำเตือน', detail: 'สินค้านี้ไม่มีโปรโมชั่นให้ลบ', life: 3000});
+      this.messageService.add({ severity: 'warn', summary: 'คำเตือน', detail: 'สินค้านี้ไม่มีโปรโมชั่นให้ลบ', life: 3000 });
     }
   }
 
@@ -554,11 +554,11 @@ export class VendorDashboardComponent implements OnInit {
       })
     ).subscribe({
       next: () => {
-        this.messageService.add({severity: 'success', summary: 'สำเร็จ', detail: 'ลบสินค้าสำเร็จ', life: 3000});
+        this.messageService.add({ severity: 'success', summary: 'สำเร็จ', detail: 'ลบสินค้าสำเร็จ', life: 3000 });
       },
       error: (err) => {
         console.error('Error deleting product:', err);
-        this.messageService.add({severity: 'error', summary: 'ข้อผิดพลาด', detail: 'เกิดข้อผิดพลาดในการลบสินค้า', life: 3000});
+        this.messageService.add({ severity: 'error', summary: 'ข้อผิดพลาด', detail: 'เกิดข้อผิดพลาดในการลบสินค้า', life: 3000 });
       }
     });
   }
@@ -591,7 +591,7 @@ export class VendorDashboardComponent implements OnInit {
         }
       });
     } else {
-      this.messageService.add({severity: 'error', summary: 'ข้อผิดพลาด', detail: 'ไม่พบ Vendor ID ในการรีเฟรช', life: 3000});
+      this.messageService.add({ severity: 'error', summary: 'ข้อผิดพลาด', detail: 'ไม่พบ Vendor ID ในการรีเฟรช', life: 3000 });
     }
   }
 

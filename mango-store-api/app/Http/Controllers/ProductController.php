@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Log; // Import Log facade
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Arr;
+use App\Models\OrderDetail;
+
 
 class ProductController extends Controller
 {
@@ -347,14 +349,26 @@ class ProductController extends Controller
                 return response()->json(['error' => 'Not Found', 'message' => 'Product not found'], 404);
             }
     
-            // Delete associated images
+            // ลบ OrderDetail ที่สัมพันธ์กับ Product
+            $orderDetails = OrderDetail::where('product_id', $product->id)->get();
+            foreach ($orderDetails as $orderDetail) {
+                $order = $orderDetail->order;
+                $orderDetail->delete(); // ลบ OrderDetail
+    
+                // ตรวจสอบว่ามี OrderDetail เหลืออยู่ใน Order นี้หรือไม่
+                if ($order->orderDetails()->count() == 0) {
+                    $order->delete(); // ถ้าไม่มี OrderDetail เหลือ ลบ Order ด้วย
+                }
+            }
+    
+            // ลบภาพที่เกี่ยวข้องกับ Product
             $product->images()->delete();
     
-            // Delete the product itself
+            // ลบตัว Product เอง
             $product->delete();
     
             return response()->json([
-                'message' => 'Product deleted successfully'
+                'message' => 'Product and related data deleted successfully'
             ], 200);
         } catch (\Exception $e) {
             Log::error('Error deleting product: ' . $e->getMessage());
@@ -364,6 +378,7 @@ class ProductController extends Controller
             ], 500);
         }
     }
+    
 
     private function compressAndConvertToBase64($sourcePath, $quality) {
         $info = getimagesize($sourcePath);
