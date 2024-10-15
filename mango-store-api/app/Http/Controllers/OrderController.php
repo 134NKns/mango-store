@@ -379,6 +379,7 @@ class OrderController extends Controller
                 foreach ($order->orderDetails as $orderDetail) {
                     $product = $orderDetail->product;
                     $product->stock -= $orderDetail->quantity;
+                    $product->save();
                     Log::info('Stock updated for product', ['product_id' => $product->id, 'new_stock' => $product->stock]);
                 }
     
